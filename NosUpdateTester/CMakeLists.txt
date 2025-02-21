@@ -1,4 +1,4 @@
-﻿project ("NosUpdateTester" VERSION ${GIT_VERSION} LANGUAGES CXX)
+﻿project ("NosUpdateTester" VERSION 0.0.1 LANGUAGES CXX)
 
-add_executable(${PROJECT_NAME} "main.cpp")
+add_executable(${PROJECT_NAME} "TesterMain.cpp")
 target_link_libraries(${PROJECT_NAME} PRIVATE "NosUpdateLib")

@@ -8,16 +8,21 @@ Get_Git_Branch()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+add_compile_definitions(WIN32_LEAN_AND_MEAN)
 project ("NosUpdateLib" VERSION ${GIT_VERSION} LANGUAGES CXX)
 
 # Version Header
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Version.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/Headers/Version.hpp")
 
 find_package(NosLib REQUIRED)
+FIND_PACKAGE(Boost REQUIRED)
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 add_subdirectory(NosUpdateLib)
 
 add_subdirectory(NosUpdateServer)
+
+add_subdirectory(NosUpdater)
 
 if(PROJECT_IS_TOP_LEVEL)
 	add_subdirectory("NosUpdateTester")
