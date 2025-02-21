@@ -8,21 +8,17 @@ Get_Git_Branch()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-project ("NosUpdater" VERSION ${GIT_VERSION} LANGUAGES CXX)
+project ("NosUpdateLib" VERSION ${GIT_VERSION} LANGUAGES CXX)
 
 # Version Header
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Version.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/Headers/Version.hpp")
 
 find_package(NosLib REQUIRED)
 
-file(GLOB_RECURSE NosUpdaterSource CONFIGURE_DEPENDS "NosUpdater/Source/*")
+add_subdirectory(NosUpdateLib)
 
-add_library(${PROJECT_NAME} SHARED ${NosUpdaterSource})
-set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
-target_include_directories(${PROJECT_NAME} "./NosUpdater/Include/")
-
-include("NosUpdateServer")
+add_subdirectory(NosUpdateServer)
 
 if(PROJECT_IS_TOP_LEVEL)
-	include("NosUpdateTester")
+	add_subdirectory("NosUpdateTester")
 endif()

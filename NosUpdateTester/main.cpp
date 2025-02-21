@@ -1,9 +1,12 @@
+#include <NosUpdate/Test.hpp>
+
 #include <iostream>
-#include <atomic>
 
 int main()
 {
-	printf("Sup Bitch\n");
+	printf("From Tester\n");
+
+	NosUpdate::TestString();
 
 	printf("Press any button to continue"); getchar();
 	return 0;

@@ -1,16 +1,12 @@
-#include <NosLib/TypeTraits.hpp>
+#include <NosUpdate/Test.hpp>
 
 #include <iostream>
-#include <atomic>
 
 int main()
 {
-	/*NosLib::DynamicArray<int> customArray({1,2,3,4});
+	printf("From Update Server\n");
 
-	for (int entry : customArray)
-	{
-		printf("%d\n", entry);
-	}*/
+	NosUpdate::TestString();
 
 	printf("Press any button to continue"); getchar();
 	return 0;

@@ -5,4 +5,4 @@
 #define NCGI_VERSION_PATCH 
 
 #define NCGI_VERSION ".."
-#define NCGI_BRANCH ""
+#define NCGI_BRANCH "master"
