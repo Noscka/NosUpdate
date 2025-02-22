@@ -1,7 +1,15 @@
 function(Get_Git_Version)
 	execute_process(COMMAND git describe --tags
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    RESULT_VARIABLE GIT_RESULT
                     OUTPUT_VARIABLE GIT_VERSION)
+
+    if(NOT GIT_RESULT EQUAL 0)
+        message(WARNING "Git describe failed, using v0.0.0 instead.")
+        set(GIT_VERSION "v0.0.0")
+    endif()
+
+    message(STATUS "CMAKE_CXX_STANDARD = ${GIT_VERSION}")
 
     string(REPLACE "\n" "" GIT_VERSION ${GIT_VERSION})
     string(REPLACE " " "" GIT_VERSION ${GIT_VERSION})
@@ -22,7 +30,13 @@ endfunction()
 function(Get_Git_Branch)
     execute_process(COMMAND git rev-parse --abbrev-ref HEAD
                     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    RESULT_VARIABLE GIT_RESULT
                     OUTPUT_VARIABLE GIT_BRANCH)
+
+     if(NOT GIT_RESULT EQUAL 0)
+        message(WARNING "Git rev-parse failed, using DEFAULT instead.")
+        set(GIT_BRANCH "DEFAULT")
+    endif()
 
     string(REPLACE "\n" "" GIT_BRANCH ${GIT_BRANCH})
     string(REPLACE " " "" GIT_BRANCH ${GIT_BRANCH})
