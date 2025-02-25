@@ -1,14 +1,28 @@
 #include <boost/asio.hpp>
 
-#include <NosUpdate/Test.hpp>
+#include <NosUpdate/Request.hpp>
+#include <NosUpdate/Definitions.hpp>
+#include <NosUpdate/Helper.hpp>
 
 #include <iostream>
+
+using tcpSocket = boost::asio::ip::tcp::socket;
+
+void SendRequest(tcpSocket& socket)
+{
+	NosUpdate::Request testRequest(NosUpdate::Request::RequestTypes::Update);
+
+	boost::asio::streambuf RequestBuf;
+	testRequest.serializeObject(&RequestBuf);
+	boost::asio::write(socket, RequestBuf);
+	boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
+}
 
 int main()
 {
 	boost::asio::io_context io_context;
 
-	boost::asio::ip::tcp::socket socket(io_context);
+	tcpSocket socket(io_context);
 
 	printf("Updater\n");
 
@@ -16,7 +30,7 @@ int main()
 	std::string HostName;
 	std::getline(std::cin, HostName);
 	if (HostName.empty())
-		HostName = "localhost";
+		HostName = "update.nosteck.com";
 
 	/*
 	Connects to the function using `resolver` which resolves the address e.g. (Noscka.com -> 123.123.123.123)
@@ -27,15 +41,11 @@ int main()
 
 	printf("Connected to server\n");
 
-	for (;;)
-	{
-		std::string message;
+	SendRequest(socket);
 
-		std::getline(std::cin, message);
-		message += "\n";
-
-		boost::asio::write(socket, boost::asio::buffer(message));
-	}
+	boost::asio::streambuf streamBuffer;
+	size_t bytesReceived = boost::asio::read_until(socket, streamBuffer, NosUpdate::GetDelimiter());
+	printf("%s\n", NosUpdate::StreamBufferToString(streamBuffer, bytesReceived).c_str());
 
 	printf("Press any button to continue"); getchar();
 	return 0;

@@ -24,7 +24,7 @@ if(UNIX)
 endif()
 
 find_package(NosLib REQUIRED)
-find_package(Boost REQUIRED COMPONENTS thread)
+find_package(Boost REQUIRED COMPONENTS thread serialization)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 add_subdirectory(NosUpdateLib)

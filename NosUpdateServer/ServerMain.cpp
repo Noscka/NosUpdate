@@ -2,10 +2,10 @@
 #include <SDKDDKVer.h>
 #endif // WIN32
 
+#include <boost/thread.hpp>
+
 #include "Header/Helper.hpp"
 #include "Header/TCPConnection.hpp"
-
-#include <NosUpdate/Test.hpp>
 
 #include <iostream>
 
@@ -14,9 +14,8 @@ int main()
 	boost::asio::io_context io_context;
 	boost::asio::ip::tcp::acceptor acceptor(io_context, boost::asio::ip::tcp::endpoint(boost::asio::ip::tcp::v4(), 8100));
 
-	printf("%s\n", EndpointAsString(acceptor.local_endpoint()).c_str());
-
 	printf("Server started\n");
+	printf("Listening on: %s\n", EndpointAsString(acceptor.local_endpoint()).c_str());
 
 	while (true)
 	{
