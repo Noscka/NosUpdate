@@ -1,10 +1,12 @@
-#include "NosUpdate/Request.hpp"
+#include <NosUpdate/Request.hpp>
+#include <NosUpdate/BoostExpand/portable_binary_oarchive.hpp>
+#include <NosUpdate/BoostExpand/portable_binary_iarchive.hpp>
 
 namespace NosUpdate
 {
-	Request::Request(boost::asio::streambuf* Streambuf)
+	Request::Request(boost::asio::streambuf* StreamBuf)
 	{
-		DeserializeObject(Streambuf);
+		DeserializeObject(StreamBuf);
 	}
 
 	Request::RequestTypes Request::GetRequestType() const
@@ -17,15 +19,17 @@ namespace NosUpdate
 		return AmountByteLeft;
 	}
 
-	void Request::serializeObject(std::streambuf* Streambuf)
+	void Request::SerializeObject(boost::asio::streambuf* StreamBuf)
 	{
-		boost::archive::binary_oarchive oa(*Streambuf);
+		std::ostream os(StreamBuf);
+		NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
 		oa&* (this);
 	}
 
-	void Request::DeserializeObject(boost::asio::streambuf* Streambuf)
+	void Request::DeserializeObject(boost::asio::streambuf* StreamBuf)
 	{
-		boost::archive::binary_iarchive ia(*Streambuf);
+		std::istream is(StreamBuf);
+		NosUpdate::BoostExpand::portable_binary_iarchive ia(is);
 		ia&* (this);
 	}
 }

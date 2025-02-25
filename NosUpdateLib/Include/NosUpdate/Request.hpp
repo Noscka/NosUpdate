@@ -1,8 +1,7 @@
 #pragma once
 
 #include <boost/asio.hpp>
-#include <boost/archive/binary_iarchive.hpp>
-#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/access.hpp>
 
 namespace NosUpdate
 {
@@ -29,14 +28,14 @@ namespace NosUpdate
 
 	public:
 		Request() {}
-		Request(boost::asio::streambuf* Streambuf);
+		Request(boost::asio::streambuf*);
 		Request(const RequestTypes& requestType) : RequestType(requestType) {}
 		Request(const RequestTypes& requestType, const uint64_t& ByteLeft) : RequestType(requestType), AmountByteLeft(ByteLeft) {}
 
 		RequestTypes GetRequestType() const;
 		uint64_t GetDataLeft() const;
 
-		void serializeObject(std::streambuf* Streambuf);
-		void DeserializeObject(boost::asio::streambuf* Streambuf);
+		void SerializeObject(boost::asio::streambuf*);
+		void DeserializeObject(boost::asio::streambuf*);
 	};
 }

@@ -13,7 +13,7 @@ void SendRequest(tcpSocket& socket)
 	NosUpdate::Request testRequest(NosUpdate::Request::RequestTypes::Update);
 
 	boost::asio::streambuf RequestBuf;
-	testRequest.serializeObject(&RequestBuf);
+	testRequest.SerializeObject(&RequestBuf);
 	boost::asio::write(socket, RequestBuf);
 	boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
 }
