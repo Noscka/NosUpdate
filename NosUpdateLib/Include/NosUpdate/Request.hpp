@@ -1,6 +1,8 @@
 #pragma once
 
 #include <boost/asio.hpp>
+#include <boost/serialization/base_object.hpp>
+#include <boost/serialization/export.hpp>
 #include <boost/serialization/access.hpp>
 
 namespace NosUpdate
@@ -8,6 +10,8 @@ namespace NosUpdate
 	class Request
 	{
 	public:
+		using Ptr = std::unique_ptr<Request>;
+
 		enum class RequestTypes
 		{
 			Update,			/* Request to update to the newest version */
@@ -19,23 +23,23 @@ namespace NosUpdate
 		template<class Archive>
 		void serialize(Archive& archive, const unsigned int)
 		{
-			archive& this->RequestType;
-			archive& this->AmountByteLeft;
+			archive& RequestType;
 		}
 
 		RequestTypes RequestType;	/* What the client wants */
-		uint64_t AmountByteLeft;	/* Currently unused: how much the client already downloaded (where to continue from) */
-
+		
 	public:
-		Request() {}
+		Request() = default;
 		Request(boost::asio::streambuf*);
 		Request(const RequestTypes& requestType) : RequestType(requestType) {}
-		Request(const RequestTypes& requestType, const uint64_t& ByteLeft) : RequestType(requestType), AmountByteLeft(ByteLeft) {}
 
-		RequestTypes GetRequestType() const;
-		uint64_t GetDataLeft() const;
+		virtual ~Request(){}
 
-		void SerializeObject(boost::asio::streambuf*);
-		void DeserializeObject(boost::asio::streambuf*);
+		virtual RequestTypes GetRequestType() const;
+
+		static void SerializeRequest(Request*, boost::asio::streambuf*);
+		static Ptr DeserializeRequest(boost::asio::streambuf*);
 	};
 }
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(NosUpdate::Request)

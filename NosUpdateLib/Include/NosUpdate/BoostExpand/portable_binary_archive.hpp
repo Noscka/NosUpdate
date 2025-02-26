@@ -1,6 +1,8 @@
 #ifndef PORTABLE_BINARY_ARCHIVE_HPP
 #define PORTABLE_BINARY_ARCHIVE_HPP
 
+/* FOUND HERE: https://www.boost.org/doc/libs/1_87_0/libs/serialization/example/ */
+
 // (C) Copyright 2002 Robert Ramey - http://www.rrsd.com .
 // Use, modification and distribution is subject to the Boost Software
 // License, Version 1.0. (See accompanying file LICENSE_1_0.txt or copy at
@@ -22,6 +24,7 @@
 
 #include <boost/archive/basic_archive.hpp>
 #include <boost/predef/other/endian.h>
+#include <boost/archive/basic_archive.hpp>
 
 enum portable_binary_archive_flags
 {

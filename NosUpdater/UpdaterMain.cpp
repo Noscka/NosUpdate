@@ -1,21 +1,41 @@
+#ifdef WIN32
+#include <SDKDDKVer.h>
+#endif // WIN32
+
 #include <boost/asio.hpp>
 
-#include <NosUpdate/Request.hpp>
+#include <NosUpdate/Request/UpdateRequest.hpp>
 #include <NosUpdate/Definitions.hpp>
 #include <NosUpdate/Helper.hpp>
 
 #include <iostream>
 
 using tcpSocket = boost::asio::ip::tcp::socket;
+using ReqType = NosUpdate::Request::RequestTypes;
 
-void SendRequest(tcpSocket& socket)
+void SendRequest(tcpSocket& socket, const ReqType& reqType)
 {
-	NosUpdate::Request testRequest(NosUpdate::Request::RequestTypes::Update);
+	NosUpdate::Request testRequest(reqType);
 
 	boost::asio::streambuf RequestBuf;
-	testRequest.SerializeObject(&RequestBuf);
-	boost::asio::write(socket, RequestBuf);
-	boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
+	NosUpdate::Request::SerializeRequest(&testRequest, &RequestBuf);
+	NosUpdate::SimpleWrite(socket, RequestBuf);
+}
+
+void SendUpdateRequest(tcpSocket& socket)
+{
+	NosUpdate::UpdateRequest testRequest(130);
+
+	boost::asio::streambuf RequestBuf;
+	NosUpdate::Request::SerializeRequest(&testRequest, &RequestBuf);
+	NosUpdate::SimpleWrite(socket, RequestBuf);
+}
+
+void ReceiveResponse(tcpSocket& socket)
+{
+	boost::asio::streambuf streamBuffer;
+	size_t bytesReceived = boost::asio::read_until(socket, streamBuffer, NosUpdate::GetDelimiter());
+	printf("%s\n", NosUpdate::StreamBufferToString(streamBuffer, bytesReceived).c_str());
 }
 
 int main()
@@ -41,11 +61,11 @@ int main()
 
 	printf("Connected to server\n");
 
-	SendRequest(socket);
+	SendRequest(socket, ReqType::NewestVersion);
+	ReceiveResponse(socket);
 
-	boost::asio::streambuf streamBuffer;
-	size_t bytesReceived = boost::asio::read_until(socket, streamBuffer, NosUpdate::GetDelimiter());
-	printf("%s\n", NosUpdate::StreamBufferToString(streamBuffer, bytesReceived).c_str());
+	SendUpdateRequest(socket);
+	ReceiveResponse(socket);
 
 	printf("Press any button to continue"); getchar();
 	return 0;

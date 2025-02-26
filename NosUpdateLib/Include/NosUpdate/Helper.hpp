@@ -13,10 +13,17 @@ namespace NosUpdate
 		return std::string(bufSeqStart, bufSeqEnd);
 	}
 
-	/*template<typename SyncWriteStream, typename BufferSequence>
-	void SimpleWrite(const SyncWriteStream& socket, BufferSequence streamBuf)
+	template<typename SyncWriteStream, typename BufferSequence>
+	void SimpleWrite(SyncWriteStream& socket, BufferSequence& streamBuf)
 	{
 		boost::asio::write(socket, streamBuf);
 		boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
-	}*/
+	}
+
+	template<typename SyncWriteStream, typename BufferSequence>
+	void SimpleWrite(SyncWriteStream& socket, BufferSequence&& streamBuf)
+	{
+		boost::asio::write(socket, streamBuf);
+		boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
+	}
 }
