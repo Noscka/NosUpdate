@@ -23,19 +23,19 @@ and now works:                              file(500MB) -> send, repeat untill a
 
 namespace Definition
 {
-	const std::string Delimiter = "\n\r\n\r\n\013\x4\n";
-	constexpr int SegementSize = 524288000;
+	inline const std::string Delimiter = "\n\r\n\r\n\013\x4\n";
+	inline constexpr int SegementSize = 524288000;
 	typedef unsigned char byte;
 }
 
 namespace NosUpdate
 {
-	std::string GetDelimiter()
+	inline std::string GetDelimiter()
 	{
 		return Definition::Delimiter;
 	}
 
-	std::string GetRawDelimiter()
+	inline std::string GetRawDelimiter()
 	{
 		std::string returnString = Definition::Delimiter;
 		boost::replace_all(returnString, L"\n", L"\\n");

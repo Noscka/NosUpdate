@@ -1,6 +1,7 @@
 #include <NosUpdate/WinVersion.hpp>
 
 #include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
 
 #include <NosUpdate/Request.hpp>
 #include <NosUpdate/Request/UpdateRequest.hpp>
@@ -9,10 +10,10 @@
 
 #include <iostream>
 
-using tcpSocket = boost::asio::ip::tcp::socket;
+using SSLSocket = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 using ReqType = NosUpdate::Request::RequestTypes;
 
-void SendRequest(tcpSocket& socket, const ReqType& reqType)
+void SendRequest(SSLSocket& socket, const ReqType& reqType)
 {
 	boost::asio::streambuf reqBuf;
 	NosUpdate::Request::Ptr req(new NosUpdate::Request(reqType));
@@ -20,7 +21,7 @@ void SendRequest(tcpSocket& socket, const ReqType& reqType)
 	NosUpdate::SimpleWrite(socket, reqBuf);
 }
 
-void SendUpdateRequest(tcpSocket& socket)
+void SendUpdateRequest(SSLSocket& socket)
 {
 	boost::asio::streambuf reqBuf;
 	NosUpdate::Request::Ptr req(new NosUpdate::UpdateRequest(130));
@@ -31,35 +32,55 @@ void SendUpdateRequest(tcpSocket& socket)
 	updateReq->GetDataLeft();
 }
 
-void ReceiveResponse(tcpSocket& socket)
+void ReceiveResponse(SSLSocket& socket)
 {
 	boost::asio::streambuf streamBuffer;
 	size_t bytesReceived = boost::asio::read_until(socket, streamBuffer, NosUpdate::GetDelimiter());
 	printf("%s\n", NosUpdate::StreamBufferToString(streamBuffer, bytesReceived).c_str());
 }
 
-int main()
+std::string GetServerHostName()
 {
-	boost::asio::io_context io_context;
-
-	tcpSocket socket(io_context);
-
-	printf("Updater\n");
-
 	printf("Type in hostname: ");
 	std::string HostName;
 	std::getline(std::cin, HostName);
 	if (HostName.empty())
-		HostName = "update.nosteck.com";
+		HostName = "localhost";
+
+	return HostName;
+}
+
+int main()
+{
+	boost::asio::io_context io_context;
+	boost::asio::ssl::context ssl_context(boost::asio::ssl::context::sslv23);
+	ssl_context.load_verify_file("server.crt");
+	ssl_context.set_default_verify_paths();
+
+	SSLSocket socket(io_context, ssl_context);
+
+	printf("Updater\n");
+
+#if 0
+	std::string hostName = GetServerHostName();
+#else
+	std::string hostName = "update.nosteck.com";
+#endif
+
+	printf("connecting to: %s\n", hostName.c_str());
 
 	/*
 	Connects to the function using `resolver` which resolves the address e.g. (Noscka.com -> 123.123.123.123)
 	Host - Hostname/Ip address
 	Service - Service(Hostname for ports)/Port number
 	*/
-	boost::asio::connect(socket, boost::asio::ip::tcp::resolver(io_context).resolve(HostName.c_str(), "8100"));
+	boost::asio::connect(socket.lowest_layer(), boost::asio::ip::tcp::resolver(io_context).resolve(hostName.c_str(), "8100"));
 
-	printf("Connected to server\n");
+	socket.set_verify_mode(boost::asio::ssl::verify_peer);
+	// You might want to add a verification callback here.
+	socket.handshake(boost::asio::ssl::stream_base::client);
+
+	printf("Connected to server with TLS\n");
 
 	SendRequest(socket, ReqType::NewestVersion);
 	ReceiveResponse(socket);

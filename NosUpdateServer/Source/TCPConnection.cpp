@@ -7,19 +7,32 @@
 
 #include <boost/serialization/unique_ptr.hpp>
 
-tcp_connection* tcp_connection::create(boost::asio::io_context& io_context)
+TLSConnection* TLSConnection::CreateConnection(boost::asio::io_context& io_context, bSSL::context& ssl_context)
 {
-	return new tcp_connection(io_context);
+	return new TLSConnection(io_context, ssl_context);
 }
 
-boost::asio::ip::tcp::socket& tcp_connection::ConSocket()
+TLSConnection::TLSStream& TLSConnection::GetTLSSocket()
 {
-	return socket;
+	return TLSSocket;
 }
 
-void tcp_connection::start()
+TLSConnection::TCPStream& TLSConnection::GetSocket()
 {
-	printf("Client Connected from %s\n", EndpointAsString(socket.local_endpoint()).c_str());
+	return TLSSocket.next_layer();
+}
+
+void TLSConnection::start()
+{
+	boost::system::error_code ec;
+	TLSSocket.handshake(bSSL::stream_base::server, ec);
+	if (ec)
+	{
+		std::cerr << "Handshake error: " << ec.message() << "\n";
+		return;
+	}
+
+	printf("Client Connected from %s\n", NosUpdate::EndpointAsString(GetSocket().local_endpoint()).c_str());
 
 	boost::system::error_code error;
 
@@ -30,18 +43,18 @@ void tcp_connection::start()
 	}
 }
 
-NosUpdate::Request::Ptr tcp_connection::GetClientsRequest()
+NosUpdate::Request::Ptr TLSConnection::GetClientsRequest()
 {
 	NosUpdate::Request::Ptr clientsRequest;
 
 	boost::asio::streambuf reqBuf;
-	boost::asio::read_until(socket, reqBuf, NosUpdate::GetDelimiter());
+	boost::asio::read_until(TLSSocket, reqBuf, NosUpdate::GetDelimiter());
 	clientsRequest = NosUpdate::Request::DeserializeRequest(&reqBuf);
 
 	return clientsRequest;
 }
 
-void tcp_connection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
+void TLSConnection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 {
 	using rqTp = NosUpdate::Request::RequestTypes;
 	std::string acknowledgement;
@@ -60,7 +73,7 @@ void tcp_connection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 
 
 		printf("Client %s\n", acknowledgement.c_str());
-		NosUpdate::SimpleWrite(socket, boost::asio::buffer(acknowledgement));
+		NosUpdate::SimpleWrite(TLSSocket, boost::asio::buffer(acknowledgement));
 		break;
 	}
 
@@ -68,7 +81,7 @@ void tcp_connection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 		acknowledgement = "Requested Newest Version";
 
 		printf("Client %s\n", acknowledgement.c_str());
-		NosUpdate::SimpleWrite(socket, boost::asio::buffer(acknowledgement));
+		NosUpdate::SimpleWrite(TLSSocket, boost::asio::buffer(acknowledgement));
 		break;
 	}
 }
