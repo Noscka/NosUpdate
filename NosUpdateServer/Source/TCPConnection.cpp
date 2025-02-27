@@ -1,11 +1,6 @@
-#include "../Header/TCPConnection.hpp"
-
-#include <NosUpdate/Request.hpp>
-#include <NosUpdate/Request/UpdateRequest.hpp>
+#include "../Header/TLSConnection.hpp"
 
 #include <NosUpdate/Helper.hpp>
-
-#include <boost/serialization/unique_ptr.hpp>
 
 TLSConnection* TLSConnection::CreateConnection(boost::asio::io_context& io_context, bSSL::context& ssl_context)
 {

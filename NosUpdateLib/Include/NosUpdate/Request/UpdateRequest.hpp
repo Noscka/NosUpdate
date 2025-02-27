@@ -1,5 +1,5 @@
 #pragma once
-#include <NosUpdate/Request.hpp>
+#include "Request.hpp"
 #include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>
 #include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
 #include <boost/serialization/unique_ptr.hpp>

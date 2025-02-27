@@ -25,7 +25,7 @@ namespace Definition
 {
 	inline const std::string Delimiter = "\n\r\n\r\n\013\x4\n";
 	inline constexpr int SegementSize = 524288000;
-	typedef unsigned char byte;
+	typedef unsigned char Byte;
 }
 
 namespace NosUpdate
@@ -38,10 +38,10 @@ namespace NosUpdate
 	inline std::string GetRawDelimiter()
 	{
 		std::string returnString = Definition::Delimiter;
-		boost::replace_all(returnString, L"\n", L"\\n");
-		boost::replace_all(returnString, L"\r", L"\\r");
-		boost::replace_all(returnString, L"\013", L"\\013");
-		boost::replace_all(returnString, L"\x4", L"\\x4");
+		boost::replace_all(returnString, "\n", "\\n");
+		boost::replace_all(returnString, "\r", "\\r");
+		boost::replace_all(returnString, "\013", "\\013");
+		boost::replace_all(returnString, "\x4", "\\x4");
 		return returnString;
 	}
 }

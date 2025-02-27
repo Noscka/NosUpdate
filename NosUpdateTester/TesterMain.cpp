@@ -2,8 +2,7 @@
 
 #include <boost/asio/streambuf.hpp>
 #include <format>
-#include <NosUpdate/Request.hpp>
-#include <NosUpdate/Request/UpdateRequest.hpp>
+#include <NosUpdate/Requests.hpp>
 
 using ReqType = NosUpdate::Request::RequestTypes;
 

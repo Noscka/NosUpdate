@@ -1,5 +1,5 @@
-#include <NosUpdate/Request.hpp>
-#include <NosUpdate/Request/UpdateRequest.hpp>
+#include <NosUpdate/Request/Request.hpp>
+#include <NosUpdate/Requests.hpp>
 
 namespace NosUpdate
 {

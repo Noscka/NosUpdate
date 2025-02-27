@@ -3,8 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
-#include <NosUpdate/Request.hpp>
-#include <NosUpdate/Request/UpdateRequest.hpp>
+#include <NosUpdate/Requests.hpp>
 #include <NosUpdate/Definitions.hpp>
 #include <NosUpdate/Helper.hpp>
 
@@ -61,7 +60,7 @@ int main()
 
 	printf("Updater\n");
 
-#if 0
+#if 1
 	std::string hostName = GetServerHostName();
 #else
 	std::string hostName = "update.nosteck.com";

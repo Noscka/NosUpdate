@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-#include <NosUpdate/Request.hpp>
+#include <NosUpdate/Requests.hpp>
 #include <iostream>
 
 namespace
