@@ -1,9 +1,6 @@
 #include <NosUpdate/Request.hpp>
-#include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>
-#include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
-#include <boost/serialization/unique_ptr.hpp>
-
-#include <memory>
+//#include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>
+//#include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
 
 namespace NosUpdate
 {
@@ -31,10 +28,11 @@ namespace NosUpdate
 		ia >> *this;
 	}*/
 
-	void Request::SerializeRequest(Request* objectPtr, boost::asio::streambuf* StreamBuf)
+	/*void Request::SerializeRequest(Request* objectPtr, boost::asio::streambuf* StreamBuf)
 	{
 		std::ostream os(StreamBuf);
-		NosUpdate::BoostExpand::polymorphic_portable_binary_oarchive oa(os);
+		boost::archive::polymorphic_binary_oarchive oa(os);
+		//NosUpdate::BoostExpand::polymorphic_portable_binary_oarchive oa(os);
 		oa << objectPtr;
 	}
 
@@ -42,8 +40,11 @@ namespace NosUpdate
 	{
 		Ptr newObjectPtr;
 		std::istream is(StreamBuf);
-		NosUpdate::BoostExpand::polymorphic_portable_binary_iarchive ia(is);
+		boost::archive::polymorphic_binary_iarchive ia(is);
+		//NosUpdate::BoostExpand::polymorphic_portable_binary_iarchive ia(is);
 		ia >> newObjectPtr;
 		return newObjectPtr;
-	}
+	}*/
 }
+
+//BOOST_CLASS_EXPORT_IMPLEMENT(NosUpdate::Request)

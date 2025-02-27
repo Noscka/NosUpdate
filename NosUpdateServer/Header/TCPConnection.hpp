@@ -19,6 +19,6 @@ public:
 
 	/* Thread entrance */
 	void start();
-	NosUpdate::Request GetClientsRequest();
-	void HandleRequest(NosUpdate::Request&);
+	NosUpdate::Request::Ptr GetClientsRequest();
+	void HandleRequest(NosUpdate::Request::Ptr&);
 };

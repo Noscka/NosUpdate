@@ -1,8 +1,8 @@
 #pragma once
 
+#include "Definitions.hpp"
 #include <boost/asio.hpp>
 
-#include "Definitions.hpp"
 
 namespace NosUpdate
 {

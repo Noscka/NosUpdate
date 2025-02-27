@@ -1,5 +1,10 @@
-#ifndef BOOST_ARCHIVE_POLYMORPHIC_PORTABLE_BINARY_OARCHIVE_HPP
-#define BOOST_ARCHIVE_POLYMORPHIC_PORTABLE_BINARY_OARCHIVE_HPP
+#ifndef BOOST_ARCHIVE_POLYMORPHIC_PORTABLE_BINARY_IARCHIVE_HPP
+#define BOOST_ARCHIVE_POLYMORPHIC_PORTABLE_BINARY_IARCHIVE_HPP
+
+// For MS compilers:
+#if defined(_MSC_VER)
+# pragma once
+#endif
 
 #include <boost/archive/detail/polymorphic_iarchive_route.hpp>
 #include "portable_binary_iarchive.hpp"
@@ -10,6 +15,7 @@ namespace NosUpdate::BoostExpand
 		portable_binary_iarchive
 	> polymorphic_portable_binary_iarchive;
 }
+
 #include <boost/version.hpp>
 #if BOOST_VERSION > 103401
 BOOST_SERIALIZATION_REGISTER_ARCHIVE(
@@ -17,4 +23,4 @@ BOOST_SERIALIZATION_REGISTER_ARCHIVE(
 )
 #endif
 
-#endif // BOOST_ARCHIVE_POLYMORPHIC_PORTABLE_BINARY_OARCHIVE_HPP
+#endif // BOOST_ARCHIVE_POLYMORPHIC_PORTABLE_BINARY_IARCHIVE_HPP

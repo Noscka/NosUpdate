@@ -1,8 +1,7 @@
-#ifdef WIN32
-#include <SDKDDKVer.h>
-#endif // WIN32
+#include <NosUpdate/WinVersion.hpp>
 
 #include <boost/thread.hpp>
+#include <NosUpdate/Request.hpp>
 
 #include "Header/Helper.hpp"
 #include "Header/TCPConnection.hpp"

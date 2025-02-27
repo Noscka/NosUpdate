@@ -1,5 +1,7 @@
 #pragma once
-#include <NosUpdate/Request.hpp>
+#include <NosUpdate/WinVersion.hpp>
+
+#include "../Request.hpp"
 #include <boost/archive/polymorphic_binary_oarchive.hpp>
 #include <boost/archive/polymorphic_binary_iarchive.hpp>
 #include <boost/serialization/unique_ptr.hpp>

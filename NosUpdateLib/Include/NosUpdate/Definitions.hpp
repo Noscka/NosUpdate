@@ -1,4 +1,6 @@
 #pragma once
+#include "WinVersion.hpp"
+
 #include <boost/algorithm/string.hpp>
 #include <string>
 

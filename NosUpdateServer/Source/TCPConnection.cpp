@@ -1,7 +1,12 @@
 #include "../Header/TCPConnection.hpp"
 
+#include <NosUpdate/Request.hpp>
+#include <NosUpdate/Request/UpdateRequest.hpp>
+
 #include <NosUpdate/Request/UpdateRequest.hpp>
 #include <NosUpdate/Helper.hpp>
+
+#include <boost/serialization/unique_ptr.hpp>
 
 tcp_connection* tcp_connection::create(boost::asio::io_context& io_context)
 {
@@ -21,33 +26,37 @@ void tcp_connection::start()
 
 	while (!error)
 	{
-		NosUpdate::Request clientsRequest = GetClientsRequest();
+		NosUpdate::Request::Ptr clientsRequest = GetClientsRequest();
 		HandleRequest(clientsRequest);
 	}
 }
 
-NosUpdate::Request tcp_connection::GetClientsRequest()
+NosUpdate::Request::Ptr tcp_connection::GetClientsRequest()
 {
-	NosUpdate::Request clientsRequest;
+	//NosUpdate::Request clientsRequest;
+	//clientsRequest.DeserializeRequest(&RequestBuf);
 
+	NosUpdate::Request::Ptr req;
 	boost::asio::streambuf RequestBuf;
 
 	boost::asio::read_until(socket, RequestBuf, NosUpdate::GetDelimiter());
-	clientsRequest.DeserializeRequest(&RequestBuf);
+	std::istream is(&RequestBuf);
+	boost::archive::polymorphic_binary_iarchive ia(is);
+	ia >> req;
 
-	return clientsRequest;
+	return req;
 }
 
-void tcp_connection::HandleRequest(NosUpdate::Request& clientsRequest)
+void tcp_connection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 {
 	using rqTp = NosUpdate::Request::RequestTypes;
 	std::string acknowledgement;
 
-	switch (clientsRequest.GetRequestType())
+	switch (clientsRequest->GetRequestType())
 	{
 	case rqTp::Update:
 	{
-		NosUpdate::UpdateRequest* updateReq = dynamic_cast<NosUpdate::UpdateRequest*>(&clientsRequest);
+		NosUpdate::UpdateRequest* updateReq = dynamic_cast<NosUpdate::UpdateRequest*>(clientsRequest.get());
 
 		acknowledgement = "Deserializing Failed";
 		if (updateReq != nullptr)
