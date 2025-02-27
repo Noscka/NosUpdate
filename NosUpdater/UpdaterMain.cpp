@@ -9,36 +9,26 @@
 
 #include <iostream>
 
-#include <boost/serialization/unique_ptr.hpp>
-
 using tcpSocket = boost::asio::ip::tcp::socket;
 using ReqType = NosUpdate::Request::RequestTypes;
 
 void SendRequest(tcpSocket& socket, const ReqType& reqType)
 {
-	//NosUpdate::Request testRequest(reqType);
-	//NosUpdate::Request::SerializeRequest(&testRequest, &RequestBuf);
-
+	boost::asio::streambuf reqBuf;
 	NosUpdate::Request::Ptr req(new NosUpdate::Request(reqType));
-	boost::asio::streambuf RequestBuf;
-	std::ostream os(&RequestBuf);
-	boost::archive::polymorphic_binary_oarchive oa(os);
-	oa << req;
-
-	NosUpdate::SimpleWrite(socket, RequestBuf);
+	NosUpdate::Request::SerializeRequest(req, &reqBuf);
+	NosUpdate::SimpleWrite(socket, reqBuf);
 }
 
 void SendUpdateRequest(tcpSocket& socket)
 {
-	//NosUpdate::UpdateRequest testRequest(130);
-	//NosUpdate::Request::SerializeRequest(&testRequest, &RequestBuf);
-
+	boost::asio::streambuf reqBuf;
 	NosUpdate::Request::Ptr req(new NosUpdate::UpdateRequest(130));
-	boost::asio::streambuf RequestBuf;
-	std::ostream os(&RequestBuf);
-	boost::archive::polymorphic_binary_oarchive oa(os);
-	oa << req;
-	NosUpdate::SimpleWrite(socket, RequestBuf);
+	NosUpdate::Request::SerializeRequest(req, &reqBuf);
+	NosUpdate::SimpleWrite(socket, reqBuf);
+
+	NosUpdate::UpdateRequest* updateReq = dynamic_cast<NosUpdate::UpdateRequest*>(req.get());
+	updateReq->GetDataLeft();
 }
 
 void ReceiveResponse(tcpSocket& socket)
@@ -46,61 +36,6 @@ void ReceiveResponse(tcpSocket& socket)
 	boost::asio::streambuf streamBuffer;
 	size_t bytesReceived = boost::asio::read_until(socket, streamBuffer, NosUpdate::GetDelimiter());
 	printf("%s\n", NosUpdate::StreamBufferToString(streamBuffer, bytesReceived).c_str());
-}
-
-void SerializeRequest(boost::asio::streambuf* streamBuf, const ReqType& reqType)
-{
-	NosUpdate::Request::Ptr req(new NosUpdate::Request(reqType));
-	std::ostream os(streamBuf);
-	boost::archive::polymorphic_binary_oarchive oa(os);
-	oa << req;
-}
-
-void SerializeUpdateRequest(boost::asio::streambuf* streamBuf)
-{
-	NosUpdate::Request::Ptr req(new NosUpdate::UpdateRequest(130));
-	std::ostream os(streamBuf);
-	boost::archive::polymorphic_binary_oarchive oa(os);
-	oa << req;
-}
-
-void HandleRequest(const NosUpdate::Request::Ptr& req)
-{
-	std::string acknowledgement;
-	switch (req->GetRequestType())
-	{
-	case ReqType::Update:
-	{
-		NosUpdate::UpdateRequest* updateReq = dynamic_cast<NosUpdate::UpdateRequest*>(req.get());
-
-		acknowledgement = "Deserializing Failed";
-		if (updateReq != nullptr)
-		{
-			acknowledgement = std::format("Requested Update | bytes left: {}", updateReq->GetDataLeft());
-		}
-
-
-		printf("Client %s\n", acknowledgement.c_str());
-		break;
-	}
-
-	case ReqType::NewestVersion:
-		acknowledgement = "Requested Newest Version";
-
-		printf("Client %s\n", acknowledgement.c_str());
-		break;
-	}
-}
-
-void DeserializeRequest(boost::asio::streambuf* streamBuf)
-{
-	NosUpdate::Request::Ptr req;
-
-	std::istream is(streamBuf);
-	boost::archive::polymorphic_binary_iarchive ia(is);
-	ia >> req;
-
-	HandleRequest(req);
 }
 
 int main()

@@ -11,7 +11,7 @@ void SerializeRequest(boost::asio::streambuf* streamBuf, const ReqType& reqType)
 {
 	NosUpdate::Request::Ptr req(new NosUpdate::Request(reqType));
 	std::ostream os(streamBuf);
-	boost::archive::polymorphic_binary_oarchive oa(os);
+	NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
 	oa << req;
 }
 
@@ -19,7 +19,7 @@ void SerializeUpdateRequest(boost::asio::streambuf* streamBuf)
 {
 	NosUpdate::Request::Ptr req(new NosUpdate::UpdateRequest(130));
 	std::ostream os(streamBuf);
-	boost::archive::polymorphic_binary_oarchive oa(os);
+	NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
 	oa << req;
 }
 
@@ -56,7 +56,7 @@ void DeserializeRequest(boost::asio::streambuf* streamBuf)
 	NosUpdate::Request::Ptr req;
 
 	std::istream is(streamBuf);
-	boost::archive::polymorphic_binary_iarchive ia(is);
+	NosUpdate::BoostExpand::portable_binary_iarchive ia(is);
 	ia >> req;
 
 	HandleRequest(req);

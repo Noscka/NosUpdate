@@ -3,8 +3,8 @@
 #include "WinVersion.hpp"
 
 #include <boost/asio.hpp>
-#include <boost/archive/polymorphic_binary_oarchive.hpp>
-#include <boost/archive/polymorphic_binary_iarchive.hpp>
+#include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>
+#include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/access.hpp>
@@ -34,17 +34,15 @@ namespace NosUpdate
 		
 	public:
 		Request() = default;
-		Request(boost::asio::streambuf*);
 		Request(const RequestTypes& requestType) : RequestType(requestType) {}
 
 		virtual ~Request() = default;
 
 		RequestTypes GetRequestType() const;
 
-		/*static void SerializeRequest(Request*, boost::asio::streambuf*);
-		static Ptr DeserializeRequest(boost::asio::streambuf*);*/
+		static void SerializeRequest(const Ptr&, boost::asio::streambuf*);
+		static Ptr DeserializeRequest(boost::asio::streambuf*);
 	};
 }
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(NosUpdate::Request)
-//BOOST_CLASS_EXPORT_KEY(NosUpdate::Request)

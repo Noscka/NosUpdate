@@ -1,7 +1,7 @@
 #pragma once
 #include <NosUpdate/Request.hpp>
-#include <boost/archive/polymorphic_binary_oarchive.hpp>
-#include <boost/archive/polymorphic_binary_iarchive.hpp>
+#include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>
+#include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/export.hpp>
@@ -26,6 +26,8 @@ namespace NosUpdate
 	public:
 		UpdateRequest() = default;
 		UpdateRequest(const uint64_t& ByteLeft) : Request(RequestTypes::Update), AmountByteLeft(ByteLeft) {}
+
+		~UpdateRequest() override = default;
 
 		uint64_t GetDataLeft() const;
 	};

@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include <boost/archive/polymorphic_binary_iarchive.hpp>
+
 int main()
 {
 	boost::asio::io_context io_context;

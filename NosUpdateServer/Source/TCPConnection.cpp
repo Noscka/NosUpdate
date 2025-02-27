@@ -3,7 +3,6 @@
 #include <NosUpdate/Request.hpp>
 #include <NosUpdate/Request/UpdateRequest.hpp>
 
-#include <NosUpdate/Request/UpdateRequest.hpp>
 #include <NosUpdate/Helper.hpp>
 
 #include <boost/serialization/unique_ptr.hpp>
@@ -33,18 +32,13 @@ void tcp_connection::start()
 
 NosUpdate::Request::Ptr tcp_connection::GetClientsRequest()
 {
-	//NosUpdate::Request clientsRequest;
-	//clientsRequest.DeserializeRequest(&RequestBuf);
+	NosUpdate::Request::Ptr clientsRequest;
 
-	NosUpdate::Request::Ptr req;
-	boost::asio::streambuf RequestBuf;
+	boost::asio::streambuf reqBuf;
+	boost::asio::read_until(socket, reqBuf, NosUpdate::GetDelimiter());
+	clientsRequest = NosUpdate::Request::DeserializeRequest(&reqBuf);
 
-	boost::asio::read_until(socket, RequestBuf, NosUpdate::GetDelimiter());
-	std::istream is(&RequestBuf);
-	boost::archive::polymorphic_binary_iarchive ia(is);
-	ia >> req;
-
-	return req;
+	return clientsRequest;
 }
 
 void tcp_connection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
