@@ -24,7 +24,7 @@ namespace NosUpdate
 		}
 	}
 
-	void Request::SerializeRequest(const Request::Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
+	void Request::SerializeRequest(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
 	{
 		std::ostream os(StreamBuf);
 		NosUpdate::BoostExpand::portable_binary_oarchive oa(os);

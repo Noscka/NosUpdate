@@ -1,10 +1,11 @@
 #pragma once
 #include <NosUpdate/WinVersion.hpp>
 #include <NosUpdate/Requests.hpp>
-#include <NosLib/Logging.hpp>
+
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-#include <iostream>
+
+#include <NosLib/Logging.hpp>
 
 namespace
 {
@@ -12,7 +13,7 @@ namespace
 	namespace bIP = boost::asio::ip;
 }
 
-class TLSConnection
+class TLSClient
 {
 	using ASIOContext = boost::asio::io_context;
 	using ASIOTLSContext = boost::asio::ssl::context;
@@ -21,26 +22,34 @@ class TLSConnection
 	using NosLog = NosLib::Logging;
 
 public:
-	static TLSConnection* CreateConnection(boost::asio::io_context&, bSSL::context&);
+	TLSClient(ASIOContext& ioContext, ASIOTLSContext& tlsContext, const std::string& hostname, const uint16_t& port) :
+		IOContext(ioContext),
+		TLSContext(tlsContext),
+		TLSSocket(ioContext, tlsContext),
+		Hostname(hostname),
+		Port(port)
+	{}
+
 	TLSStream& GetTLSSocket();
 	TCPStream& GetSocket();
 	std::string GetLocalEndpoint();
 	std::string GetRemoteEndpoint();
 
-	/* Thread entrance */
-	void start();
-	NosUpdate::Request::Ptr GetClientsRequest();
-	void HandleRequest(NosUpdate::Request::Ptr&);
+	void Connect(); /* Connects to server */
+	void SendRequests();
 
-	virtual ~TLSConnection() = default;
+	virtual ~TLSClient() = default;
 protected:
-	TLSStream TLSSocket;
 
-	TLSConnection() = default;
-	inline TLSConnection(ASIOContext& io_context, ASIOTLSContext& ssl_context) : TLSSocket(io_context, ssl_context)
-	{}
+	TLSClient() = default;
 private:
+	ASIOContext& IOContext;
+	ASIOTLSContext& TLSContext;
+	TLSStream TLSSocket;
+	std::string Hostname;
+	uint16_t Port;
+
 	/* Prevent copying */
-	TLSConnection(const TLSConnection&);
-	const TLSConnection& operator=(const TLSConnection&);
+	TLSClient(const TLSClient&);
+	const TLSClient& operator=(const TLSClient&);
 };

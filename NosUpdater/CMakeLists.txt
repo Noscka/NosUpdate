@@ -1,6 +1,8 @@
 ﻿project ("NosUpdater" VERSION ${GIT_VERSION} LANGUAGES CXX)
 
-add_executable(${PROJECT_NAME} "UpdaterMain.cpp")
+file(GLOB_RECURSE UpdaterSource CONFIGURE_DEPENDS "Source/*")
+
+add_executable(${PROJECT_NAME} "UpdaterMain.cpp" ${UpdaterSource})
 target_link_libraries(${PROJECT_NAME} PRIVATE "NosUpdateLib")
 
 add_custom_command(

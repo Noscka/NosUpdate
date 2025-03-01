@@ -5,6 +5,8 @@
 int main()
 {
 	NosLib::Logging::SetVerboseLevel(NosLib::Logging::Verbose::Debug);
+	NosLib::Logging::Verbose verbos = NosLib::Logging::GetVerboseLevel();
+	printf("%hhu", verbos);
 
 	std::string exampleString = "I am String";
 	NosLib::Logging::CreateLog(NosLib::Logging::Severity::Info, "Normal String: {} | Raw Char String {}", exampleString, "I am Char Array");
