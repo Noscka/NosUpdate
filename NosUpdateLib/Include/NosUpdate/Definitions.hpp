@@ -21,23 +21,26 @@ the server used to send the file like this: file(all) -> memory -> send
 and now works:                              file(500MB) -> send, repeat untill all sent
 */
 
-namespace Definition
+namespace Definitions
 {
 	inline const std::string Delimiter = "\n\r\n\r\n\013\x4\n";
 	inline constexpr int SegementSize = 524288000;
 	typedef unsigned char Byte;
+
+	inline const std::string UpdateHostname = "update.nosteck.com";
+	inline constexpr uint16_t UpdatePort = 8100;
 }
 
 namespace NosUpdate
 {
 	inline std::string GetDelimiter()
 	{
-		return Definition::Delimiter;
+		return Definitions::Delimiter;
 	}
 
 	inline std::string GetRawDelimiter()
 	{
-		std::string returnString = Definition::Delimiter;
+		std::string returnString = Definitions::Delimiter;
 		boost::replace_all(returnString, "\n", "\\n");
 		boost::replace_all(returnString, "\r", "\\r");
 		boost::replace_all(returnString, "\013", "\\013");

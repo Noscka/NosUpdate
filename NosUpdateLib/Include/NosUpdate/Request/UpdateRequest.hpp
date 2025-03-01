@@ -26,8 +26,12 @@ namespace NosUpdate
 	public:
 		UpdateRequest() = default;
 		UpdateRequest(const uint64_t& ByteLeft) : Request(RequestTypes::Update), AmountByteLeft(ByteLeft) {}
-
 		~UpdateRequest() override = default;
+
+		std::string GetRequestName() const override
+		{
+			return "UpdateRequest";
+		}
 
 		uint64_t GetDataLeft() const;
 	};

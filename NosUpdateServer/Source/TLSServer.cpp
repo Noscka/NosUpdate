@@ -1,14 +1,15 @@
 #include "../Header/TLSServer.hpp"
-
 #include "../Header/TLSConnection.hpp"
+
 #include <NosUpdate/Helper.hpp>
 
 #include <iostream>
 
 void TLSServer::AcceptLoop()
 {
-	printf("Server Started\n");
-	printf("Listening on: %s\n", NosUpdate::EndpointAsString(ConnectionAcceptor.local_endpoint()).c_str());
+	NosLog::CreateLog(NosLog::Severity::Info, "Server Started");
+	std::string listenEndpoint = NosUpdate::EndpointAsString(ConnectionAcceptor.local_endpoint());
+	NosLog::CreateLog(NosLog::Severity::Debug, "Listening on: {}", listenEndpoint);
 
 	while (true)
 	{
@@ -23,7 +24,7 @@ void TLSServer::AcceptNewConnection()
 
 	boost::system::error_code error;
 
-	printf("Waiting for connection\n");
+	NosLog::CreateLog(NosLog::Severity::Debug, "Waiting for connection");
 	ConnectionAcceptor.accept(newTlsCon->GetSocket(), error);
 
 	/* if no errors, create thread for the new connection */
@@ -32,6 +33,6 @@ void TLSServer::AcceptNewConnection()
 		delete newTlsCon;
 		return;
 	}
-	printf("Connection Made, Starting New Thread for Connection\n");
+	NosLog::CreateLog(NosLog::Severity::Debug, "Connection Made, Starting New Thread for Connection");
 	boost::thread* ClientThread = new boost::thread(boost::bind(&TLSConnection::start, newTlsCon));
 }

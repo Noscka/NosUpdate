@@ -1,7 +1,9 @@
 #pragma once
+#include <NosUpdate/WinVersion.hpp>
+#include <NosUpdate/Requests.hpp>
+#include <NosLib/Logging.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-#include <NosUpdate/Requests.hpp>
 #include <iostream>
 
 namespace
@@ -14,11 +16,14 @@ class TLSConnection
 {
 	using TCPStream = bIP::tcp::socket;
 	using TLSStream = bSSL::stream<bIP::tcp::socket>;
+	using NosLog = NosLib::Logging;
 
 public:
 	static TLSConnection* CreateConnection(boost::asio::io_context&, bSSL::context&);
 	TLSStream& GetTLSSocket();
 	TCPStream& GetSocket();
+	std::string GetLocalEndpoint();
+	std::string GetRemoteEndpoint();
 
 	/* Thread entrance */
 	void start();

@@ -1,4 +1,5 @@
 #include <NosUpdate/WinVersion.hpp>
+#include <NosUpdate/Definitions.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -6,6 +7,7 @@
 #include <NosUpdate/Requests.hpp>
 #include <NosUpdate/Definitions.hpp>
 #include <NosUpdate/Helper.hpp>
+#include <NosLib/Logging.hpp>
 
 #include <iostream>
 
@@ -51,6 +53,8 @@ std::string GetServerHostName()
 
 int main()
 {
+	NosLib::Logging::SetVerboseLevel(NosLib::Logging::Verbose::Debug);
+
 	boost::asio::io_context io_context;
 	boost::asio::ssl::context ssl_context(boost::asio::ssl::context::sslv23);
 	ssl_context.load_verify_file("server.crt");
@@ -63,7 +67,7 @@ int main()
 #if 1
 	std::string hostName = GetServerHostName();
 #else
-	std::string hostName = "update.nosteck.com";
+	std::string hostName = Definitions::UpdateHostname;
 #endif
 
 	printf("connecting to: %s\n", hostName.c_str());
@@ -73,7 +77,7 @@ int main()
 	Host - Hostname/Ip address
 	Service - Service(Hostname for ports)/Port number
 	*/
-	boost::asio::connect(socket.lowest_layer(), boost::asio::ip::tcp::resolver(io_context).resolve(hostName.c_str(), "8100"));
+	boost::asio::connect(socket.lowest_layer(), boost::asio::ip::tcp::resolver(io_context).resolve(hostName.c_str(), std::to_string(Definitions::UpdatePort)));
 
 	socket.set_verify_mode(boost::asio::ssl::verify_peer);
 	// You might want to add a verification callback here.

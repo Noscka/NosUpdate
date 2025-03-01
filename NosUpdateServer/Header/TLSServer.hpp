@@ -1,4 +1,7 @@
 #pragma once
+#include <NosUpdate/WinVersion.hpp>
+#include <NosLib/Logging.hpp>
+
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/thread.hpp>
@@ -13,6 +16,7 @@ class TLSServer
 {
 	using ASIOContext = boost::asio::io_context;
 	using ASIOTLSContext = boost::asio::ssl::context;
+	using NosLog = NosLib::Logging;
 
 public:
 	TLSServer(ASIOContext& ioContext, ASIOTLSContext& tlsContext, const uint16_t& port) :

@@ -17,19 +17,27 @@ TLSConnection::TCPStream& TLSConnection::GetSocket()
 	return TLSSocket.next_layer();
 }
 
+std::string TLSConnection::GetLocalEndpoint()
+{
+	return NosUpdate::EndpointAsString(GetSocket().local_endpoint());
+}
+
+std::string TLSConnection::GetRemoteEndpoint()
+{
+	return NosUpdate::EndpointAsString(GetSocket().remote_endpoint());
+}
+
 void TLSConnection::start()
 {
-	boost::system::error_code ec;
-	TLSSocket.handshake(bSSL::stream_base::server, ec);
-	if (ec)
+	boost::system::error_code error;
+	TLSSocket.handshake(bSSL::stream_base::server, error);
+	if (error)
 	{
-		std::cerr << "Handshake error: " << ec.message() << "\n";
+		NosLog::CreateLog(NosLog::Severity::Error, "Closing connection with {} | Handshake error: {}", GetRemoteEndpoint(), error.message());
 		return;
 	}
 
-	printf("Client Connected from %s\n", NosUpdate::EndpointAsString(GetSocket().local_endpoint()).c_str());
-
-	boost::system::error_code error;
+	NosLog::CreateLog(NosLog::Severity::Info, "Client succesfully connected from {}", GetRemoteEndpoint());
 
 	while (!error)
 	{
@@ -44,7 +52,10 @@ NosUpdate::Request::Ptr TLSConnection::GetClientsRequest()
 
 	boost::asio::streambuf reqBuf;
 	boost::asio::read_until(TLSSocket, reqBuf, NosUpdate::GetDelimiter());
+	NosLog::CreateLog(NosLog::Severity::Debug, "Got Client Request");
 	clientsRequest = NosUpdate::Request::DeserializeRequest(&reqBuf);
+
+	NosLog::CreateLog(NosLog::Severity::Debug, "Client Request Deserialized | Class Name: {} | Type Name: {}", clientsRequest->GetRequestName(), clientsRequest->GetRequestTypeName());
 
 	return clientsRequest;
 }

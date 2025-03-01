@@ -35,10 +35,14 @@ namespace NosUpdate
 	public:
 		Request() = default;
 		Request(const RequestTypes& requestType) : RequestType(requestType) {}
-
 		virtual ~Request() = default;
 
 		RequestTypes GetRequestType() const;
+		std::string GetRequestTypeName() const;
+		virtual std::string GetRequestName() const
+		{
+			return "Request";
+		}
 
 		static void SerializeRequest(const Ptr&, boost::asio::streambuf*);
 		static Ptr DeserializeRequest(boost::asio::streambuf*);

@@ -1,13 +1,14 @@
 #include <NosUpdate/WinVersion.hpp>
+#include <NosUpdate/Definitions.hpp>
 
-#include <NosUpdate/Helper.hpp>
 #include "Header/TLSServer.hpp"
-#include "Header/TLSConnection.hpp"
-
+#include <NosLib/Logging.hpp>
 #include <iostream>
 
 int main()
 {
+	NosLib::Logging::SetVerboseLevel(NosLib::Logging::Verbose::Debug);
+
 	boost::asio::io_context io_context;
 
 	boost::asio::ssl::context ssl_context(boost::asio::ssl::context::sslv23);
@@ -19,7 +20,7 @@ int main()
 	ssl_context.use_private_key_file("server.pem", boost::asio::ssl::context::pem);
 	ssl_context.use_tmp_dh_file("dh2048.pem");
 
-	TLSServer updateServer(io_context, ssl_context, 8100);
+	TLSServer updateServer(io_context, ssl_context, Definitions::UpdatePort);
 
 	updateServer.AcceptLoop();
 	

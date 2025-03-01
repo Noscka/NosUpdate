@@ -8,6 +8,22 @@ namespace NosUpdate
 		return RequestType;
 	}
 
+	std::string Request::GetRequestTypeName() const
+	{
+		switch (RequestType)
+		{
+			using enum RequestTypes;
+		case Update:
+			return "Update";
+
+		case NewestVersion:
+			return "NewestVersion";
+
+		default:
+			return "UNDEFINED";
+		}
+	}
+
 	void Request::SerializeRequest(const Request::Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
 	{
 		std::ostream os(StreamBuf);
