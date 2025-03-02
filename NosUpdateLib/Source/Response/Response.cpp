@@ -1,18 +1,18 @@
-#include <NosUpdate/Request/Request.hpp>
-#include <NosUpdate/Requests.hpp>
+#include <NosUpdate/Response/Response.hpp>
+#include <NosUpdate/Responses.hpp>
 
 namespace NosUpdate
 {
-	Request::RequestTypes Request::GetRequestType() const
+	Response::ResponseTypes Response::GetResponseType() const
 	{
-		return RequestType;
+		return ResponseType;
 	}
 
-	std::string Request::GetRequestTypeName() const
+	std::string Response::GetResponseTypeName() const
 	{
-		switch (RequestType)
+		switch (ResponseType)
 		{
-			using enum RequestTypes;
+			using enum ResponseTypes;
 		case NewestVersion:
 			return "NewestVersion";
 
@@ -24,14 +24,14 @@ namespace NosUpdate
 		}
 	}
 
-	void Request::SerializeRequest(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
+	void Response::SerializeResponse(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
 	{
 		std::ostream os(StreamBuf);
 		NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
 		oa << objectPtr;
 	}
 
-	Request::Ptr Request::DeserializeRequest(boost::asio::streambuf* StreamBuf)
+	Response::Ptr Response::DeserializeResponse(boost::asio::streambuf* StreamBuf)
 	{
 		Ptr newObjectPtr;
 		std::istream is(StreamBuf);

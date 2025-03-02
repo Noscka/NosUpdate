@@ -16,7 +16,7 @@ namespace NosUpdate
 	public:
 		using Ptr = std::unique_ptr<Request>;
 
-		enum class RequestTypes
+		enum class RequestTypes : uint8_t
 		{
 			NewestVersion,	/* Request to get newest version */
 			Update,			/* Request to update to the newest version */
