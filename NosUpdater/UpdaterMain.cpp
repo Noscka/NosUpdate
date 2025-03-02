@@ -33,7 +33,7 @@ int main()
 
 	printf("Updater\n");
 
-	#if 1
+	#if 0
 	std::string hostName = GetServerHostName();
 	#else
 	std::string hostName = Definitions::UpdateHostname;

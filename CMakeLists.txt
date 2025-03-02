@@ -8,7 +8,12 @@ Get_Git_Branch()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(Boost_USE_STATIC_LIBS ON) 
+if(WIN32)
+	set(Boost_USE_STATIC_LIBS ON) 
+else()
+	set(Boost_USE_STATIC_LIBS OFF) 
+endif()
+
 set(Boost_USE_MULTITHREADED ON)  
 set(Boost_USE_STATIC_RUNTIME OFF) 
 set(BUILD_SHARED_LIBS ON)

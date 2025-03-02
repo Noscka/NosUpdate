@@ -6,8 +6,6 @@
 
 #include <iostream>
 
-using NosLog = NosLib::Logging;
-
 TLSClient::TLSStream& TLSClient::GetTLSSocket()
 {
 	return TLSSocket;
@@ -42,7 +40,6 @@ void TLSClient::Connect()
 
 	NosLog::CreateLog(NosLog::Severity::Info, "Succesfully connected to: {}:{}", Hostname, Port);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Endpoint: {}", GetRemoteEndpoint());
-
 }
 
 void TLSClient::UpdateProgram()

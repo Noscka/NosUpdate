@@ -1,11 +1,10 @@
 #pragma once
 #include <NosUpdate/WinVersion.hpp>
 #include <NosUpdate/Requests.hpp>
+#include <NosLib/Logging.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
-
-#include <NosLib/Logging.hpp>
 
 namespace
 {
