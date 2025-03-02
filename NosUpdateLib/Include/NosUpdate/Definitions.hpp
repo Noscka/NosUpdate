@@ -24,8 +24,6 @@ and now works:                              file(500MB) -> send, repeat untill a
 
 namespace Definitions
 {
-	inline const std::string Delimiter = "\n\r\n\r\n\013\x4\n";
-	inline constexpr int SegementSize = 524288000;
 	typedef unsigned char Byte;
 
 	inline const std::string UpdateHostname = "update.nosteck.com";

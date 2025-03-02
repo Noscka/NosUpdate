@@ -13,27 +13,45 @@ namespace NosUpdate
 	inline std::string StreamBufferToString(const boost::asio::streambuf& streamBuffer, const size_t& bytesReceived)
 	{
 		auto bufSeqStart = boost::asio::buffers_begin(streamBuffer.data());
-		auto bufSeqEnd = boost::asio::buffers_begin(streamBuffer.data()) + bytesReceived - NosUpdate::GetDelimiter().size();
+		auto bufSeqEnd = boost::asio::buffers_begin(streamBuffer.data()) + bytesReceived;
 		return std::string(bufSeqStart, bufSeqEnd);
 	}
 
 	template<typename SyncWriteStream, typename BufferSequence>
 	inline void SimpleWrite(SyncWriteStream& socket, BufferSequence& streamBuf)
 	{
+		uint64_t dataSize = static_cast<uint64_t>(streamBuf.size());
+
+		Definitions::Byte dataSizeBytes[sizeof(dataSize)];
+		std::copy(static_cast<const char*>(static_cast<const void*>(&dataSize)),
+				  static_cast<const char*>(static_cast<const void*>(&dataSize)) + sizeof(dataSize),
+				  dataSizeBytes);
+
+		boost::asio::write(socket, boost::asio::buffer(dataSizeBytes));
 		boost::asio::write(socket, streamBuf);
-		boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
 	}
 
 	template<typename SyncWriteStream, typename BufferSequence>
 	inline void SimpleWrite(SyncWriteStream& socket, BufferSequence&& streamBuf)
 	{
-		boost::asio::write(socket, streamBuf);
-		boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
+		SimpleWrite(socket, streamBuf);
 	}
 
 	template<typename SyncWriteStream, typename BufferSequence>
 	inline void SimpleRead(SyncWriteStream& socket, BufferSequence& streamBuf)
 	{
-		boost::asio::read_until(socket, streamBuf, NosUpdate::GetDelimiter());
+		uint64_t dataSize = 0;
+		Definitions::Byte dataSizeBytes[sizeof(dataSize)];
+
+		boost::asio::streambuf headerBuf;
+		boost::asio::read(socket, headerBuf, boost::asio::transfer_exactly(sizeof(dataSize)));
+		std::istream is(&headerBuf);
+		is.read(reinterpret_cast<char*>(dataSizeBytes), sizeof(dataSize));
+
+		std::copy(dataSizeBytes,
+				  dataSizeBytes + sizeof(dataSize),
+				  reinterpret_cast<char*>(&dataSize));
+
+		boost::asio::read(socket, streamBuf, boost::asio::transfer_exactly(dataSize));
 	}
 }
