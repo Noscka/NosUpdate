@@ -30,4 +30,10 @@ namespace NosUpdate
 		boost::asio::write(socket, streamBuf);
 		boost::asio::write(socket, boost::asio::buffer(NosUpdate::GetDelimiter()));
 	}
+
+	template<typename SyncWriteStream, typename BufferSequence>
+	inline void SimpleRead(SyncWriteStream& socket, BufferSequence& streamBuf)
+	{
+		boost::asio::read_until(socket, streamBuf, NosUpdate::GetDelimiter());
+	}
 }

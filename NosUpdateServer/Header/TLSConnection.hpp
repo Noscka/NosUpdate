@@ -29,11 +29,13 @@ public:
 
 	/* Thread entrance */
 	void start();
-	NosUpdate::Request::Ptr GetClientsRequest();
-	void HandleRequest(NosUpdate::Request::Ptr&);
 
 	virtual ~TLSConnection() = default;
 protected:
+	NosUpdate::Request::Ptr GetClientsRequest();
+	void HandleRequest(NosUpdate::Request::Ptr&);
+	void HandleVersionRequest(NosUpdate::Request::Ptr&);
+
 	TLSStream TLSSocket;
 
 	TLSConnection() = default;

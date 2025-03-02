@@ -13,8 +13,8 @@ namespace NosUpdate
 		switch (ResponseType)
 		{
 			using enum ResponseTypes;
-		case NewestVersion:
-			return "NewestVersion";
+		case Version:
+			return "Version";
 
 		case Update:
 			return "Update";

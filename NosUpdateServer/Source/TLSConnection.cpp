@@ -1,4 +1,5 @@
 #include "../Header/TLSConnection.hpp"
+#include <NosUpdate/Responses.hpp>
 
 #include <NosUpdate/Helper.hpp>
 
@@ -51,11 +52,9 @@ NosUpdate::Request::Ptr TLSConnection::GetClientsRequest()
 	NosUpdate::Request::Ptr clientsRequest;
 
 	boost::asio::streambuf reqBuf;
-	boost::asio::read_until(TLSSocket, reqBuf, NosUpdate::GetDelimiter());
+	NosUpdate::SimpleRead(TLSSocket, reqBuf);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Got Client Request");
 	clientsRequest = NosUpdate::Request::DeserializeRequest(&reqBuf);
-
-	NosLog::CreateLog(NosLog::Severity::Debug, "Client Request Deserialized | Class Name: {} | Type Name: {}", clientsRequest->GetRequestName(), clientsRequest->GetRequestTypeName());
 
 	return clientsRequest;
 }
@@ -83,11 +82,28 @@ void TLSConnection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 		break;
 	}
 
-	case rqTp::NewestVersion:
-		acknowledgement = "Requested Newest Version";
-
-		printf("Client %s\n", acknowledgement.c_str());
-		NosUpdate::SimpleWrite(TLSSocket, boost::asio::buffer(acknowledgement));
+	case rqTp::Version:
+		HandleVersionRequest(clientsRequest);
 		break;
 	}
+}
+
+void TLSConnection::HandleVersionRequest(NosUpdate::Request::Ptr& clientsRequest)
+{
+	NosUpdate::VersionRequest* versionReq = dynamic_cast<NosUpdate::VersionRequest*>(clientsRequest.get());
+
+	if (versionReq == nullptr)
+	{
+		NosLog::CreateLog(NosLog::Severity::Error, "Unable to deserialize Version Request");
+		return;
+	}
+	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested {} Version", versionReq->GetVersionTypeName());
+
+	boost::asio::streambuf resBuf;
+	NosUpdate::Response::Ptr res(new NosUpdate::VersionResponse("v0.0.1"));
+	NosUpdate::Response::SerializeResponse(res, &resBuf);
+	NosUpdate::SimpleWrite(TLSSocket, resBuf);
+
+	NosUpdate::VersionResponse* versionRes = dynamic_cast<NosUpdate::VersionResponse*>(res.get());
+	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", versionRes->GetRequestedVersion());
 }

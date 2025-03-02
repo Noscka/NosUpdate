@@ -9,32 +9,39 @@
 
 namespace NosUpdate
 {
-	class NOSUPDATE_API UpdateRequest : public Request
+	class NOSUPDATE_API VersionRequest : public Request
 	{
+	public:
+		enum class VersionTypes : uint8_t
+		{
+			Newest,	/* Request to get newest version */
+		};
+
 	private:
 		friend class boost::serialization::access;
 		template<class Archive>
 		void serialize(Archive& archive, const unsigned int)
 		{
 			archive& boost::serialization::base_object<Request>(*this);
-			archive& AmountByteLeft;
+			archive& VersionType;
 		}
 
 	protected:
-		uint64_t AmountByteLeft;	/* Currently unused: how much the client already downloaded (where to continue from) */
+		VersionTypes VersionType;	/* What the client wants */
 
 	public:
-		UpdateRequest() = default;
-		UpdateRequest(const uint64_t& byteLeft) : Request(RequestTypes::Update), AmountByteLeft(byteLeft) {}
-		~UpdateRequest() override = default;
+		VersionRequest() = default;
+		VersionRequest(const VersionTypes& versionType) : Request(RequestTypes::Version), VersionType(versionType) {}
+		~VersionRequest() override = default;
 
 		std::string GetRequestName() const override
 		{
-			return "UpdateRequest";
+			return "VersionRequest";
 		}
 
-		uint64_t GetDataLeft() const;
+		VersionTypes GetVersionType() const;
+		std::string GetVersionTypeName() const;
 	};
 }
 
-BOOST_CLASS_EXPORT_KEY(NosUpdate::UpdateRequest)
+BOOST_CLASS_EXPORT_KEY(NosUpdate::VersionRequest)

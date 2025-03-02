@@ -37,10 +37,10 @@ public:
 
 	void Connect(); /* Connects to server */
 	void UpdateProgram();
-	void SendRequests();
 
 	virtual ~TLSClient() = default;
 protected:
+	std::string GetNewestVersion();
 
 	TLSClient() = default;
 private:

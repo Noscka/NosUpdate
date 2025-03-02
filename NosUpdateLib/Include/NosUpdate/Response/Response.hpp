@@ -18,7 +18,7 @@ namespace NosUpdate
 
 		enum class ResponseTypes : uint8_t
 		{
-			NewestVersion,	/* Response to get newest version */
+			Version,	/* Response to get newest version */
 			Update,			/* Response to update to the newest version */
 		};
 

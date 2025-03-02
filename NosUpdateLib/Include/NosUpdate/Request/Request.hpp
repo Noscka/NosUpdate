@@ -18,8 +18,8 @@ namespace NosUpdate
 
 		enum class RequestTypes : uint8_t
 		{
-			NewestVersion,	/* Request to get newest version */
-			Update,			/* Request to update to the newest version */
+			Version,	/* Request to get version */
+			Update,		/* Request to update to a specified version */
 		};
 
 	private:

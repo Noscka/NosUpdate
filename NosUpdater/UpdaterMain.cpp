@@ -41,7 +41,7 @@ int main()
 
 	TLSClient updateClient(io_context, ssl_context, hostName, Definitions::UpdatePort);
 	updateClient.Connect();
-	updateClient.SendRequests();
+	updateClient.UpdateProgram();
 
 	printf("Press any button to continue"); getchar();
 	return 0;

@@ -24,7 +24,7 @@ void TLSServer::AcceptNewConnection()
 
 	boost::system::error_code error;
 
-	NosLog::CreateLog(NosLog::Severity::Debug, "Waiting for connection");
+	NosLog::CreateLog(NosLog::Severity::Debug, "Ready for New Connection");
 	ConnectionAcceptor.accept(newTlsCon->GetSocket(), error);
 
 	/* if no errors, create thread for the new connection */
