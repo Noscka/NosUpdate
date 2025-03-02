@@ -36,6 +36,7 @@ public:
 	std::string GetRemoteEndpoint();
 
 	void Connect(); /* Connects to server */
+	void UpdateProgram();
 	void SendRequests();
 
 	virtual ~TLSClient() = default;

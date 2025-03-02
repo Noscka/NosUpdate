@@ -1,6 +1,7 @@
 #include "../Header/TLSClient.hpp"
 
 #include <NosUpdate/Helper.hpp>
+#include <NosUpdate/Requests.hpp>
 
 #include <iostream>
 
@@ -34,12 +35,24 @@ void TLSClient::Connect()
 	boost::asio::connect(GetSocket(), boost::asio::ip::tcp::resolver(IOContext).resolve(Hostname.c_str(), std::to_string(Port)));
 
 	TLSSocket.set_verify_mode(boost::asio::ssl::verify_peer);
-	// You might want to add a verification callback here.
 	TLSSocket.handshake(boost::asio::ssl::stream_base::client);
+
 	NosLog::CreateLog(NosLog::Severity::Info, "Succesfully connected to: {}:{}", Hostname, Port);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Endpoint: {}", GetRemoteEndpoint());
 
 }
+
+void TLSClient::UpdateProgram()
+{
+	/* Check newest version */
+
+	/* If newest version is newer then current version */
+	/* Update */
+}
+
+
+
+
 
 using SSLSocket = boost::asio::ssl::stream<boost::asio::ip::tcp::socket>;
 using ReqType = NosUpdate::Request::RequestTypes;
@@ -63,10 +76,6 @@ void SendUpdateRequest(SSLSocket& socket)
 	NosUpdate::SimpleWrite(socket, reqBuf);
 
 	NosLog::CreateLog(NosLog::Severity::Debug, "Client Request Deserialized | Class Name: {} | Type Name: {}", req->GetRequestName(), req->GetRequestTypeName());
-
-	/* Needed because otherwise boost can't deserialize the UpdateRequest object. Makes literally 0 fucking sense */
-	NosUpdate::UpdateRequest* updateReq = dynamic_cast<NosUpdate::UpdateRequest*>(req.get());
-	updateReq->GetDataLeft();
 }
 
 void ReceiveResponse(SSLSocket& socket)

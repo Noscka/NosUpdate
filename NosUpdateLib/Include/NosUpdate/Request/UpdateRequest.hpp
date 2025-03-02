@@ -9,7 +9,7 @@
 
 namespace NosUpdate
 {
-	class UpdateRequest : public Request
+	class NOSUPDATE_API UpdateRequest : public Request
 	{
 	private:
 		friend class boost::serialization::access;

@@ -1,5 +1,6 @@
 #pragma once
 #include "WinVersion.hpp"
+#include <NosUpdate/Internal/Export.hpp>
 
 #include <boost/algorithm/string.hpp>
 #include <string>

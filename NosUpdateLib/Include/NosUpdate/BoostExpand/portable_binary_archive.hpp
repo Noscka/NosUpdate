@@ -12,7 +12,7 @@
 #if defined(_MSC_VER)
 # pragma once
 #endif
-
+#include <NosUpdate/WinVersion.hpp>
 #include <boost/config.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>

@@ -11,15 +11,15 @@
 
 namespace NosUpdate
 {
-	class Request
+	class NOSUPDATE_API Request
 	{
 	public:
 		using Ptr = std::unique_ptr<Request>;
 
 		enum class RequestTypes
 		{
+			NewestVersion,	/* Request to get newest version */
 			Update,			/* Request to update to the newest version */
-			NewestVersion	/* Request to get newest version */
 		};
 
 	private:
