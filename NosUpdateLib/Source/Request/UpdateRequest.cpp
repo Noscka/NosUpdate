@@ -1,9 +1,9 @@
 #include <NosUpdate/Request/UpdateRequest.hpp>
 namespace NosUpdate
 {
-	uint64_t UpdateRequest::GetDataLeft() const
+	Version UpdateRequest::GetUpdateVersion() const
 	{
-		return AmountByteLeft;
+		return UpdateVersion;
 	}
 }
 

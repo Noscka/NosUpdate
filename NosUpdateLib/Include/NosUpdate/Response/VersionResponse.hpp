@@ -7,6 +7,8 @@
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/access.hpp>
 
+#include <NosUpdate/Version.hpp>
+
 namespace NosUpdate
 {
 	class NOSUPDATE_API VersionResponse : public Response
@@ -21,11 +23,11 @@ namespace NosUpdate
 		}
 
 	protected:
-		std::string RequestedVersion;
+		Version RequestedVersion;
 
 	public:
 		VersionResponse() = default;
-		VersionResponse(const std::string& requestedVersion) : Response(ResponseTypes::Version), RequestedVersion(requestedVersion) {}
+		VersionResponse(const Version& requestedVersion) : Response(ResponseTypes::Version), RequestedVersion(requestedVersion) {}
 		~VersionResponse() override = default;
 
 		std::string GetResponseName() const override
@@ -33,7 +35,7 @@ namespace NosUpdate
 			return "VersionResponse";
 		}
 
-		std::string GetRequestedVersion() const;
+		Version GetRequestedVersion() const;
 	};
 }
 

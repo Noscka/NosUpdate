@@ -7,6 +7,8 @@
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/access.hpp>
 
+#include <NosUpdate/Version.hpp>
+
 namespace NosUpdate
 {
 	class NOSUPDATE_API UpdateRequest : public Request
@@ -17,15 +19,16 @@ namespace NosUpdate
 		void serialize(Archive& archive, const unsigned int)
 		{
 			archive& boost::serialization::base_object<Request>(*this);
-			archive& AmountByteLeft;
+			archive& UpdateVersion;
 		}
 
 	protected:
-		uint64_t AmountByteLeft;	/* Currently unused: how much the client already downloaded (where to continue from) */
+		Version UpdateVersion;
+		//uint64_t AmountByteLeft;	/* Currently unused: how much the client already downloaded (where to continue from) */
 
 	public:
-		UpdateRequest() = default;
-		UpdateRequest(const uint64_t& byteLeft) : Request(RequestTypes::Update), AmountByteLeft(byteLeft) {}
+		UpdateRequest() : Request(RequestTypes::Update) {}
+		UpdateRequest(const Version& updateVersion) : Request(RequestTypes::Update), UpdateVersion(updateVersion) {}
 		~UpdateRequest() override = default;
 
 		std::string GetRequestName() const override
@@ -33,7 +36,7 @@ namespace NosUpdate
 			return "UpdateRequest";
 		}
 
-		uint64_t GetDataLeft() const;
+		Version GetUpdateVersion() const;
 	};
 }
 

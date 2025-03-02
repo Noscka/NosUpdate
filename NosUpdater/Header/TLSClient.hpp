@@ -1,6 +1,7 @@
 #pragma once
 #include <NosUpdate/WinVersion.hpp>
 #include <NosUpdate/Requests.hpp>
+#include <NosUpdate/Version.hpp>
 #include <NosLib/Logging.hpp>
 
 #include <boost/asio.hpp>
@@ -39,7 +40,8 @@ public:
 
 	virtual ~TLSClient() = default;
 protected:
-	std::string GetNewestVersion();
+	NosUpdate::Version GetNewestVersion();
+	void RequestUpdate(const NosUpdate::Version&);
 
 	TLSClient() = default;
 private:

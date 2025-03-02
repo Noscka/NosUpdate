@@ -1,7 +1,7 @@
 #include <NosUpdate/Response/VersionResponse.hpp>
 namespace NosUpdate
 {
-	std::string VersionResponse::GetRequestedVersion() const
+	Version VersionResponse::GetRequestedVersion() const
 	{
 		return RequestedVersion;
 	}

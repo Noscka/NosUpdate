@@ -73,7 +73,7 @@ void TLSConnection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 		acknowledgement = "Deserializing Failed";
 		if (updateReq != nullptr)
 		{
-			acknowledgement = std::format("Requested Update | bytes left: {}", updateReq->GetDataLeft());
+			//acknowledgement = std::format("Requested Update | bytes left: {}", updateReq->GetDataLeft());
 		}
 
 
@@ -100,10 +100,11 @@ void TLSConnection::HandleVersionRequest(NosUpdate::Request::Ptr& clientsRequest
 	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested {} Version", versionReq->GetVersionTypeName());
 
 	boost::asio::streambuf resBuf;
-	NosUpdate::Response::Ptr res(new NosUpdate::VersionResponse("v0.0.1"));
+	NosUpdate::Version requestedVersion(0, 0, 1);
+	NosUpdate::Response::Ptr res(new NosUpdate::VersionResponse(requestedVersion));
 	NosUpdate::Response::SerializeResponse(res, &resBuf);
 	NosUpdate::SimpleWrite(TLSSocket, resBuf);
 
 	NosUpdate::VersionResponse* versionRes = dynamic_cast<NosUpdate::VersionResponse*>(res.get());
-	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", versionRes->GetRequestedVersion());
+	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", versionRes->GetRequestedVersion().GetVersion());
 }
