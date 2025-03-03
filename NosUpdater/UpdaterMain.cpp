@@ -31,8 +31,6 @@ int main()
 	ssl_context.load_verify_file("server.crt");
 	ssl_context.set_default_verify_paths();
 
-	printf("Updater\n");
-
 	#if 1
 	std::string hostName = GetServerHostName();
 	#else

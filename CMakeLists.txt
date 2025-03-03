@@ -30,7 +30,7 @@ if(UNIX)
 endif()
 
 find_package(NosLib REQUIRED)
-find_package(Boost REQUIRED COMPONENTS thread serialization)
+find_package(Boost REQUIRED COMPONENTS thread serialization filesystem)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 add_subdirectory(NosUpdateLib)

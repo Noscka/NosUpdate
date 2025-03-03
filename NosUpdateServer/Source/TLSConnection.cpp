@@ -2,6 +2,7 @@
 #include <NosUpdate/Responses.hpp>
 
 #include <NosUpdate/Helper.hpp>
+#include <NosUpdate/FileNet/FileSend.hpp>
 
 TLSConnection* TLSConnection::CreateConnection(boost::asio::io_context& io_context, bSSL::context& ssl_context)
 {
@@ -93,6 +94,7 @@ void TLSConnection::HandleVersionRequest(NosUpdate::Request::Ptr& clientsRequest
 	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", updateVersion.GetVersion());
 }
 
+#include <boost/filesystem.hpp>
 void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 {
 	NosUpdate::UpdateRequest::Ptr updateReq = NosLib::Pointer::DynamicUniquePtrCast<NosUpdate::UpdateRequest, NosUpdate::Request>(std::move(clientsRequest));
@@ -105,6 +107,10 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 
 	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested Update to {} Version", updateReq->GetUpdateVersion().GetVersion());
 
+	uint64_t unchangedTotalSize = boost::filesystem::file_size(boost::filesystem::path("NosUpdateServer.exe"));
+
 	NosUpdate::Version updateVersion(0, 0, 1);
-	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, 130);
+	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, unchangedTotalSize);
+
+	NosUpdate::SendFile(TLSSocket);
 }

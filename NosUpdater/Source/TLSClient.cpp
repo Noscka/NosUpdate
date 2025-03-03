@@ -3,6 +3,7 @@
 #include <NosUpdate/Helper.hpp>
 #include <NosUpdate/Requests.hpp>
 #include <NosUpdate/Responses.hpp>
+#include <NosUpdate/FileNet/FileReceive.hpp>
 
 #include <iostream>
 
@@ -84,4 +85,6 @@ void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 		return;
 	}
 	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | version: {} | File Size: {}", updateRes->GetUpdateVersion().GetVersion(), updateRes->GetFileSize());
+
+	NosUpdate::ReceiveFile(TLSSocket, updateRes->GetFileSize());
 }
