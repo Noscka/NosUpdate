@@ -54,7 +54,7 @@ NosUpdate::Request::Ptr TLSConnection::GetClientsRequest()
 	boost::asio::streambuf reqBuf;
 	NosUpdate::SimpleRead(TLSSocket, reqBuf);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Got Client Request");
-	clientsRequest = NosUpdate::Request::DeserializeRequest(&reqBuf);
+	clientsRequest = NosUpdate::Request::Deserialize(&reqBuf);
 
 	return clientsRequest;
 }
@@ -67,20 +67,8 @@ void TLSConnection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 	switch (clientsRequest->GetRequestType())
 	{
 	case rqTp::Update:
-	{
-		NosUpdate::UpdateRequest* updateReq = dynamic_cast<NosUpdate::UpdateRequest*>(clientsRequest.get());
-
-		acknowledgement = "Deserializing Failed";
-		if (updateReq != nullptr)
-		{
-			//acknowledgement = std::format("Requested Update | bytes left: {}", updateReq->GetDataLeft());
-		}
-
-
-		printf("Client %s\n", acknowledgement.c_str());
-		NosUpdate::SimpleWrite(TLSSocket, boost::asio::buffer(acknowledgement));
+		HandleUpdateRequest(clientsRequest);
 		break;
-	}
 
 	case rqTp::Version:
 		HandleVersionRequest(clientsRequest);
@@ -90,21 +78,33 @@ void TLSConnection::HandleRequest(NosUpdate::Request::Ptr& clientsRequest)
 
 void TLSConnection::HandleVersionRequest(NosUpdate::Request::Ptr& clientsRequest)
 {
-	NosUpdate::VersionRequest* versionReq = dynamic_cast<NosUpdate::VersionRequest*>(clientsRequest.get());
+	NosUpdate::VersionRequest::Ptr versionReq = NosLib::Pointer::DynamicUniquePtrCast<NosUpdate::VersionRequest, NosUpdate::Request>(std::move(clientsRequest));
 
-	if (versionReq == nullptr)
+	if (!versionReq)
 	{
-		NosLog::CreateLog(NosLog::Severity::Error, "Unable to deserialize Version Request");
+		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Version Request");
 		return;
 	}
 	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested {} Version", versionReq->GetVersionTypeName());
 
-	boost::asio::streambuf resBuf;
-	NosUpdate::Version requestedVersion(0, 0, 1);
-	NosUpdate::Response::Ptr res(new NosUpdate::VersionResponse(requestedVersion));
-	NosUpdate::Response::SerializeResponse(res, &resBuf);
-	NosUpdate::SimpleWrite(TLSSocket, resBuf);
+	NosUpdate::Version updateVersion(0, 0, 1);
+	NosUpdate::SerializeSend<NosUpdate::VersionResponse>(TLSSocket, updateVersion);
 
-	NosUpdate::VersionResponse* versionRes = dynamic_cast<NosUpdate::VersionResponse*>(res.get());
-	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", versionRes->GetRequestedVersion().GetVersion());
+	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", updateVersion.GetVersion());
+}
+
+void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
+{
+	NosUpdate::UpdateRequest::Ptr updateReq = NosLib::Pointer::DynamicUniquePtrCast<NosUpdate::UpdateRequest, NosUpdate::Request>(std::move(clientsRequest));
+
+	if (!updateReq)
+	{
+		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Request");
+		return;
+	}
+
+	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested Update to {} Version", updateReq->GetUpdateVersion().GetVersion());
+
+	NosUpdate::Version updateVersion(0, 0, 1);
+	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, 130);
 }

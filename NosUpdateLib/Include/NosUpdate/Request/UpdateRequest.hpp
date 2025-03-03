@@ -13,6 +13,9 @@ namespace NosUpdate
 {
 	class NOSUPDATE_API UpdateRequest : public Request
 	{
+	public:
+		using Ptr = std::unique_ptr<UpdateRequest>;
+
 	private:
 		friend class boost::serialization::access;
 		template<class Archive>

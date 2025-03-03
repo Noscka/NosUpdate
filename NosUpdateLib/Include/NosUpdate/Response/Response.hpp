@@ -14,6 +14,7 @@ namespace NosUpdate
 	class NOSUPDATE_API Response
 	{
 	public:
+		using Base = Response;
 		using Ptr = std::unique_ptr<Response>;
 
 		enum class ResponseTypes : uint8_t
@@ -44,8 +45,8 @@ namespace NosUpdate
 			return "Response";
 		}
 
-		static void SerializeResponse(const Ptr&, boost::asio::streambuf*);
-		static Ptr DeserializeResponse(boost::asio::streambuf*);
+		static void Serialize(const Ptr&, boost::asio::streambuf*);
+		static Ptr Deserialize(boost::asio::streambuf*);
 	};
 }
 

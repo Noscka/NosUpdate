@@ -14,6 +14,7 @@ namespace NosUpdate
 	class NOSUPDATE_API Request
 	{
 	public:
+		using Base = Request;
 		using Ptr = std::unique_ptr<Request>;
 
 		enum class RequestTypes : uint8_t
@@ -44,8 +45,8 @@ namespace NosUpdate
 			return "Request";
 		}
 
-		static void SerializeRequest(const Ptr&, boost::asio::streambuf*);
-		static Ptr DeserializeRequest(boost::asio::streambuf*);
+		static void Serialize(const Ptr&, boost::asio::streambuf*);
+		static Ptr Deserialize(boost::asio::streambuf*);
 	};
 }
 

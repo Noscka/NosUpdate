@@ -12,6 +12,9 @@ namespace NosUpdate
 	class NOSUPDATE_API VersionRequest : public Request
 	{
 	public:
+		using Ptr = std::unique_ptr<VersionRequest>;
+
+	public:
 		enum class VersionTypes : uint8_t
 		{
 			Newest,	/* Request to get newest version */

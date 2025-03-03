@@ -45,7 +45,7 @@ void TLSClient::Connect()
 void TLSClient::UpdateProgram()
 {
 	NosUpdate::Version newestVersion = GetNewestVersion();
-	//RequestUpdate(newestVersion);
+	RequestUpdate(newestVersion);
 	
 
 
@@ -55,23 +55,17 @@ void TLSClient::UpdateProgram()
 
 NosUpdate::Version TLSClient::GetNewestVersion()
 {
-	boost::asio::streambuf reqBuf;
-	NosUpdate::Request::Ptr req(new NosUpdate::VersionRequest(NosUpdate::VersionRequest::VersionTypes::Newest));
-	NosUpdate::Request::SerializeRequest(req, &reqBuf);
-	NosUpdate::SimpleWrite(TLSSocket, reqBuf);
+	NosUpdate::SerializeSend<NosUpdate::VersionRequest>(TLSSocket, NosUpdate::VersionRequest::VersionTypes::Newest);
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Newest Version");
 
-	NosUpdate::Response::Ptr serverResponse;
+	NosUpdate::VersionResponse::Ptr versionRes = NosUpdate::DeserializeRead<NosUpdate::VersionResponse>(TLSSocket);
 
-	NosUpdate::SimpleRead(TLSSocket, reqBuf);
-	serverResponse = NosUpdate::Response::DeserializeResponse(&reqBuf);
-	NosUpdate::VersionResponse* versionRes = dynamic_cast<NosUpdate::VersionResponse*>(serverResponse.get());
-
-	if (versionRes == nullptr)
+	if (!versionRes)
 	{
-		NosLog::CreateLog(NosLog::Severity::Error, "Unable to deserialize Version Response");
+		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Version Response");
 		return NosUpdate::Version();
 	}
+
 	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded with {} Version", versionRes->GetRequestedVersion().GetVersion());
 
 	return versionRes->GetRequestedVersion();
@@ -79,22 +73,15 @@ NosUpdate::Version TLSClient::GetNewestVersion()
 
 void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
-	boost::asio::streambuf reqBuf;
-	NosUpdate::Request::Ptr req(new NosUpdate::UpdateRequest());
-	NosUpdate::Request::SerializeRequest(req, &reqBuf);
-	NosUpdate::SimpleWrite(TLSSocket, reqBuf);
-	NosLog::CreateLog(NosLog::Severity::Info, "Requested Newest Version");
+	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1));
+	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
-	NosUpdate::Response::Ptr serverResponse;
+	NosUpdate::UpdateResponse::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
 
-	NosUpdate::SimpleRead(TLSSocket, reqBuf);
-	serverResponse = NosUpdate::Response::DeserializeResponse(&reqBuf);
-	NosUpdate::VersionResponse* versionRes = dynamic_cast<NosUpdate::VersionResponse*>(serverResponse.get());
-
-	if (versionRes == nullptr)
+	if (!updateRes)
 	{
-		NosLog::CreateLog(NosLog::Severity::Error, "Unable to deserialize Version Response");
+		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Response");
 		return;
 	}
-	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded with {} Version", versionRes->GetRequestedVersion().GetVersion());
+	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | version: {} | File Size: {}", updateRes->GetUpdateVersion().GetVersion(), updateRes->GetFileSize());
 }

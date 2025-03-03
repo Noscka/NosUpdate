@@ -29,21 +29,3 @@ namespace Definitions
 	inline const std::string UpdateHostname = "update.nosteck.com";
 	inline constexpr uint16_t UpdatePort = 8100;
 }
-
-namespace NosUpdate
-{
-	inline std::string GetDelimiter()
-	{
-		return Definitions::Delimiter;
-	}
-
-	inline std::string GetRawDelimiter()
-	{
-		std::string returnString = Definitions::Delimiter;
-		boost::replace_all(returnString, "\n", "\\n");
-		boost::replace_all(returnString, "\r", "\\r");
-		boost::replace_all(returnString, "\013", "\\013");
-		boost::replace_all(returnString, "\x4", "\\x4");
-		return returnString;
-	}
-}

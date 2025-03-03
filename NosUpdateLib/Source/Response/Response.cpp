@@ -24,14 +24,14 @@ namespace NosUpdate
 		}
 	}
 
-	void Response::SerializeResponse(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
+	void Response::Serialize(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
 	{
 		std::ostream os(StreamBuf);
 		NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
 		oa << objectPtr;
 	}
 
-	Response::Ptr Response::DeserializeResponse(boost::asio::streambuf* StreamBuf)
+	Response::Ptr Response::Deserialize(boost::asio::streambuf* StreamBuf)
 	{
 		Ptr newObjectPtr;
 		std::istream is(StreamBuf);

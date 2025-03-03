@@ -35,6 +35,7 @@ protected:
 	NosUpdate::Request::Ptr GetClientsRequest();
 	void HandleRequest(NosUpdate::Request::Ptr&);
 	void HandleVersionRequest(NosUpdate::Request::Ptr&);
+	void HandleUpdateRequest(NosUpdate::Request::Ptr&);
 
 	TLSStream TLSSocket;
 

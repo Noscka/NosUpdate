@@ -11,10 +11,10 @@
 
 namespace NosUpdate
 {
-	class NOSUPDATE_API VersionResponse : public Response
+	class NOSUPDATE_API UpdateResponse : public Response
 	{
 	public:
-		using Ptr = std::unique_ptr<VersionResponse>;
+		using Ptr = std::unique_ptr<UpdateResponse>;
 
 	private:
 		friend class boost::serialization::access;
@@ -22,24 +22,31 @@ namespace NosUpdate
 		void serialize(Archive& archive, const unsigned int)
 		{
 			archive& boost::serialization::base_object<Response>(*this);
-			archive& RequestedVersion;
+			archive& UpdateVersion;
+			archive& FileSize;
 		}
 
 	protected:
-		Version RequestedVersion;
+		Version UpdateVersion;
+		uint64_t FileSize;
 
 	public:
-		VersionResponse() = default;
-		VersionResponse(const Version& requestedVersion) : Response(ResponseTypes::Version), RequestedVersion(requestedVersion) {}
-		~VersionResponse() override = default;
+		UpdateResponse() = default;
+		UpdateResponse(const Version& updateVersion, const uint64_t& fileSize) :
+			Response(ResponseTypes::Version),
+			UpdateVersion(updateVersion),
+			FileSize(fileSize)
+		{}
+		~UpdateResponse() override = default;
 
 		std::string GetResponseName() const override
 		{
-			return "VersionResponse";
+			return "UpdateResponse";
 		}
 
-		Version GetRequestedVersion() const;
+		Version GetUpdateVersion() const;
+		uint64_t GetFileSize() const;
 	};
 }
 
-BOOST_CLASS_EXPORT_KEY(NosUpdate::VersionResponse)
+BOOST_CLASS_EXPORT_KEY(NosUpdate::UpdateResponse)

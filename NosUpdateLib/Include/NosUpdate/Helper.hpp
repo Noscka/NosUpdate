@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Definitions.hpp"
+#include <NosLib/Pointer.hpp>
+
 #include <boost/asio.hpp>
 
 namespace NosUpdate
@@ -53,5 +55,27 @@ namespace NosUpdate
 				  reinterpret_cast<char*>(&dataSize));
 
 		boost::asio::read(socket, streamBuf, boost::asio::transfer_exactly(dataSize));
+	}
+
+	template <class Class, class ... ClassArgs, typename SyncWriteStream>
+	void SerializeSend(SyncWriteStream& socket, ClassArgs&& ... args)
+	{
+		typename Class::Base::Ptr outObject(new Class(std::forward<ClassArgs>(args)...));
+
+		boost::asio::streambuf reqBuf;
+		Class::Base::Serialize(outObject, &reqBuf);
+		NosUpdate::SimpleWrite(socket, reqBuf);
+	}
+
+	template <class Class, class ... ClassArgs, typename SyncWriteStream>
+	Class::Ptr DeserializeRead(SyncWriteStream& socket)
+	{
+		typename Class::Base::Ptr inObject;
+
+		boost::asio::streambuf reqBuf;
+		NosUpdate::SimpleRead(socket, reqBuf);
+		inObject = Class::Base::Deserialize(&reqBuf);
+
+		return NosLib::Pointer::DynamicUniquePtrCast<Class, typename Class::Base>(std::move(inObject));
 	}
 }

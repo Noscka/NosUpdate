@@ -28,7 +28,7 @@ namespace NosUpdate
 		}
 	}
 
-	void Request::SerializeRequest(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
+	void Request::Serialize(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
 	{
 		std::ostream os(StreamBuf);
 		NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
@@ -37,7 +37,7 @@ namespace NosUpdate
 		NosLog::CreateLog(NosLog::Severity::Debug, "Serialized Request | Class Name: {} | Type Name: {}", objectPtr->GetRequestName(), objectPtr->GetRequestTypeName());
 	}
 
-	Request::Ptr Request::DeserializeRequest(boost::asio::streambuf* StreamBuf)
+	Request::Ptr Request::Deserialize(boost::asio::streambuf* StreamBuf)
 	{
 		Ptr newObjectPtr;
 		std::istream is(StreamBuf);
