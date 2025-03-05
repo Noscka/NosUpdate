@@ -87,4 +87,5 @@ void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | version: {} | File Size: {}", updateRes->GetUpdateVersion().GetVersion(), updateRes->GetFileSize());
 
 	NosUpdate::ReceiveFile(TLSSocket, updateRes->GetFileSize());
+	NosLog::CreateLog(NosLog::Severity::Debug, "Received File");
 }
