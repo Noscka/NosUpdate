@@ -7,9 +7,9 @@ namespace NosUpdate
 		return UpdateVersion;
 	}
 
-	uint64_t UpdateResponse::GetFileSize() const
+	FileInfo UpdateResponse::GetFileInfo() const
 	{
-		return FileSize;
+		return FileInfoObj;
 	}
 }
 

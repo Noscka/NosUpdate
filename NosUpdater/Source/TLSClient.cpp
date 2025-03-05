@@ -84,8 +84,14 @@ void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Response");
 		return;
 	}
-	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | version: {} | File Size: {}", updateRes->GetUpdateVersion().GetVersion(), updateRes->GetFileSize());
+	NosUpdate::FileInfo fileInfo = updateRes->GetFileInfo();
 
-	NosUpdate::ReceiveFile(TLSSocket, "TestData.txt", updateRes->GetFileSize());
+	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | Version: {} | File Name: {} | File Hash: {} | File Size: {}",
+					  updateRes->GetUpdateVersion().GetVersion(),
+					  fileInfo.GetName(),
+					  fileInfo.GetHash(),
+					  fileInfo.GetSize());
+
+	NosUpdate::ReceiveFile(TLSSocket, fileInfo.GetName(), fileInfo.GetSize());
 	NosLog::CreateLog(NosLog::Severity::Debug, "Received File");
 }

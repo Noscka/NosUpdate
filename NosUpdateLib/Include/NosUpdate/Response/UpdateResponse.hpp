@@ -8,6 +8,7 @@
 #include <boost/serialization/access.hpp>
 
 #include <NosUpdate/Version.hpp>
+#include <NosUpdate/FileInfo.hpp>
 
 namespace NosUpdate
 {
@@ -23,19 +24,19 @@ namespace NosUpdate
 		{
 			archive& boost::serialization::base_object<Response>(*this);
 			archive& UpdateVersion;
-			archive& FileSize;
+			archive& FileInfoObj;
 		}
 
 	protected:
 		Version UpdateVersion;
-		uint64_t FileSize;
+		FileInfo FileInfoObj;
 
 	public:
 		UpdateResponse() = default;
-		UpdateResponse(const Version& updateVersion, const uint64_t& fileSize) :
+		UpdateResponse(const Version& updateVersion, const std::string& FileName) :
 			Response(ResponseTypes::Version),
 			UpdateVersion(updateVersion),
-			FileSize(fileSize)
+			FileInfoObj(FileName, FileInfo::FileActions::Update)
 		{}
 		~UpdateResponse() override = default;
 
@@ -45,7 +46,7 @@ namespace NosUpdate
 		}
 
 		Version GetUpdateVersion() const;
-		uint64_t GetFileSize() const;
+		FileInfo GetFileInfo() const;
 	};
 }
 

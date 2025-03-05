@@ -19,10 +19,6 @@ set(Boost_USE_STATIC_RUNTIME OFF)
 set(BUILD_SHARED_LIBS ON)
 
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
-project ("NosUpdate" VERSION ${GIT_VERSION} LANGUAGES CXX)
-
-# Version Header
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/CMake/Version.hpp.in" "${CMAKE_CURRENT_SOURCE_DIR}/Headers/Version.hpp")
 
 if(UNIX)
 	set(NosLib_DIR "$ENV{HOME}/.local/lib/cmake/NosLib")
@@ -31,6 +27,7 @@ endif()
 
 find_package(NosLib REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread serialization filesystem)
+find_package(OpenSSL REQUIRED Crypto SSL)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 
 add_subdirectory(NosUpdateLib)

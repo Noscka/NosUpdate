@@ -107,11 +107,11 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 
 	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested Update to {} Version", updateReq->GetUpdateVersion().GetVersion());
 
-	uint64_t unchangedTotalSize = boost::filesystem::file_size(boost::filesystem::path("TestData.txt"));
+	std::string fileName = "NosUpdateTester.exe";
 
 	NosUpdate::Version updateVersion(0, 0, 1);
-	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, unchangedTotalSize);
+	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, fileName);
 
-	NosUpdate::SendFile(TLSSocket, "TestData.txt");
+	NosUpdate::SendFile(TLSSocket, fileName);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Sent File");
 }
