@@ -36,6 +36,7 @@ INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 add_subdirectory(NosUpdateLib)
 
 set(OUTDIR ${PROJECT_SOURCE_DIR}/Out/)
+set(CERTDIR ${PROJECT_SOURCE_DIR}/Extra/)
 
 add_subdirectory(NosUpdateServer)
 

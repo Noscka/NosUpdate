@@ -112,6 +112,6 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 	NosUpdate::Version updateVersion(0, 0, 1);
 	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, unchangedTotalSize);
 
-	NosUpdate::SendFile(TLSSocket);
+	NosUpdate::SendFile(TLSSocket, "TestData.txt");
 	NosLog::CreateLog(NosLog::Severity::Debug, "Sent File");
 }
