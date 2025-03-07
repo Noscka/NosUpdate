@@ -44,13 +44,13 @@ namespace NosUpdate
 			FileSize(boost::filesystem::file_size(boost::filesystem::path(fileName)))
 		{}
 
-		std::string GetName();
-		std::string GetHash();
-		FileActions GetAction();
-		uint64_t GetSize();
+		std::string GetName() const;
+		std::string GetHash() const;
+		FileActions GetAction() const;
+		uint64_t GetSize() const;
 
 	private:
-		std::string CreateSHA256Hash(const std::string& filename);
+		std::string CreateSHA256Hash(const std::string& filename) const;
 
 	};
 }

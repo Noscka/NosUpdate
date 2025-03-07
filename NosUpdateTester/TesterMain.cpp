@@ -45,7 +45,6 @@ ByteUnit GetByteUnit(const std::string& str)
 	if (str == "KB") return ByteUnit::KiloByte;
 	if (str == "MB") return ByteUnit::MegaByte;
 	if (str == "GB") return ByteUnit::GigaByte;
-
 }
 
 uint64_t GetBytes(const ByteUnit& unit)

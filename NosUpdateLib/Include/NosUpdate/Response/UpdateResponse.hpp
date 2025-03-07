@@ -4,11 +4,16 @@
 #include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/access.hpp>
 
 #include <NosUpdate/Version.hpp>
-#include <NosUpdate/FileInfo.hpp>
+#include <NosUpdate/Info/FileInfo.hpp>
+#include <NosUpdate/Info/ProgramInfo.hpp>
+
+#include <NosLib/DynamicArray.hpp>
+#include <vector>
 
 namespace NosUpdate
 {
@@ -24,20 +29,23 @@ namespace NosUpdate
 		{
 			archive& boost::serialization::base_object<Response>(*this);
 			archive& UpdateVersion;
-			archive& FileInfoObj;
+			archive& UpdateFiles;
 		}
 
 	protected:
 		Version UpdateVersion;
-		FileInfo FileInfoObj;
+		std::vector<FileInfo> UpdateFiles;
 
+		void GetUpdateFiles(const ProgramInfo&);
 	public:
 		UpdateResponse() = default;
-		UpdateResponse(const Version& updateVersion, const std::string& FileName) :
+		UpdateResponse(const Version& updateVersion, const ProgramInfo& programInf) :
 			Response(ResponseTypes::Version),
-			UpdateVersion(updateVersion),
-			FileInfoObj(FileName, FileInfo::FileActions::Update)
-		{}
+			UpdateVersion(updateVersion)
+		{
+			GetUpdateFiles(programInf);
+		}
+
 		~UpdateResponse() override = default;
 
 		std::string GetResponseName() const override
@@ -46,7 +54,7 @@ namespace NosUpdate
 		}
 
 		Version GetUpdateVersion() const;
-		FileInfo GetFileInfo() const;
+		std::vector<FileInfo> GetUpdateFileInfo() const;
 	};
 }
 

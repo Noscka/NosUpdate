@@ -47,11 +47,6 @@ void TLSClient::UpdateProgram()
 {
 	NosUpdate::Version newestVersion = GetNewestVersion();
 	RequestUpdate(newestVersion);
-	
-
-
-	/* If newest version is newer then current version */
-	/* Update */
 }
 
 NosUpdate::Version TLSClient::GetNewestVersion()
@@ -74,7 +69,7 @@ NosUpdate::Version TLSClient::GetNewestVersion()
 
 void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
-	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1));
+	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1), "TestProgram");
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
 	NosUpdate::UpdateResponse::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
@@ -84,14 +79,18 @@ void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Response");
 		return;
 	}
-	NosUpdate::FileInfo fileInfo = updateRes->GetFileInfo();
+	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
 
-	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | Version: {} | File Name: {} | File Hash: {} | File Size: {}",
-					  updateRes->GetUpdateVersion().GetVersion(),
-					  fileInfo.GetName(),
-					  fileInfo.GetHash(),
-					  fileInfo.GetSize());
+	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | Version: {}", updateRes->GetUpdateVersion().GetVersion());
 
-	NosUpdate::ReceiveFile(TLSSocket, fileInfo.GetName(), fileInfo.GetSize());
-	NosLog::CreateLog(NosLog::Severity::Debug, "Received File");
+	for (NosUpdate::FileInfo& fileInfo : fileInfos)
+	{
+		NosLog::CreateLog(NosLog::Severity::Debug, "File Name: {} | File Hash: {} | File Size: {}",
+						  fileInfo.GetName(),
+						  fileInfo.GetHash(),
+						  fileInfo.GetSize());
+	}
+
+	//NosUpdate::ReceiveFile(TLSSocket, fileInfo.GetName(), fileInfo.GetSize());
+	//NosLog::CreateLog(NosLog::Severity::Debug, "Received File");
 }

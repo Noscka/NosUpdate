@@ -67,6 +67,14 @@ namespace NosUpdate
 		NosUpdate::SimpleWrite(socket, reqBuf);
 	}
 
+	template <class Class, typename SyncWriteStream>
+	void SerializeSendPre(SyncWriteStream& socket, const typename Class::Ptr& classObject)
+	{
+		boost::asio::streambuf reqBuf;
+		Class::Base::Serialize(classObject, &reqBuf);
+		NosUpdate::SimpleWrite(socket, reqBuf);
+	}
+
 	template <class Class, class ... ClassArgs, typename SyncWriteStream>
 	Class::Ptr DeserializeRead(SyncWriteStream& socket)
 	{

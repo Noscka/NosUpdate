@@ -1,5 +1,4 @@
-#pragma once
-#include <NosUpdate/FileInfo.hpp>
+#include <NosUpdate/Info/FileInfo.hpp>
 
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -11,27 +10,27 @@
 #include <vector>
 #include <stdexcept>
 
-std::string NosUpdate::FileInfo::GetName()
+std::string NosUpdate::FileInfo::GetName() const
 {
 	return FileName;
 }
 
-std::string NosUpdate::FileInfo::GetHash()
+std::string NosUpdate::FileInfo::GetHash() const
 {
 	return Hash;
 }
 
-NosUpdate::FileInfo::FileActions NosUpdate::FileInfo::GetAction()
+NosUpdate::FileInfo::FileActions NosUpdate::FileInfo::GetAction() const
 {
 	return FileAction;
 }
 
-uint64_t NosUpdate::FileInfo::GetSize()
+uint64_t NosUpdate::FileInfo::GetSize() const
 {
 	return FileSize;
 }
 
-std::string NosUpdate::FileInfo::CreateSHA256Hash(const std::string& filename)
+std::string NosUpdate::FileInfo::CreateSHA256Hash(const std::string& filename) const
 {
 	const size_t bufferSize = 4096;
 	std::vector<unsigned char> buffer(bufferSize);

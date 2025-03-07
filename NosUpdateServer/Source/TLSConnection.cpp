@@ -94,7 +94,6 @@ void TLSConnection::HandleVersionRequest(NosUpdate::Request::Ptr& clientsRequest
 	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", updateVersion.GetVersion());
 }
 
-#include <boost/filesystem.hpp>
 void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 {
 	NosUpdate::UpdateRequest::Ptr updateReq = NosLib::Pointer::DynamicUniquePtrCast<NosUpdate::UpdateRequest, NosUpdate::Request>(std::move(clientsRequest));
@@ -104,14 +103,19 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Request");
 		return;
 	}
+	
+	NosUpdate::ProgramInfo progInfo = updateReq->GetProgramInfo();
 
-	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested Update to {} Version", updateReq->GetUpdateVersion().GetVersion());
+	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested Update | Version: {} | Program Name: {}",
+					  updateReq->GetUpdateVersion().GetVersion(),
+					  progInfo.GetNormalizedName());
 
-	std::string fileName = "NosUpdateTester.exe";
+	std::string fileName = "TestData.txt";
 
-	NosUpdate::Version updateVersion(0, 0, 1);
-	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, fileName);
+	NosUpdate::Version updateVersion = updateReq->GetUpdateVersion();
 
-	NosUpdate::SendFile(TLSSocket, fileName);
-	NosLog::CreateLog(NosLog::Severity::Debug, "Sent File");
+	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, progInfo);
+
+	//NosUpdate::SendFile(TLSSocket, fileName);
+	//NosLog::CreateLog(NosLog::Severity::Debug, "Sent File");
 }
