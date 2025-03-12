@@ -110,11 +110,10 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 					  updateReq->GetUpdateVersion().GetVersion(),
 					  progInfo.GetNormalizedName());
 
-	std::string fileName = "TestData.txt";
+	//std::string fileName = "TestData.txt";
 
 	NosUpdate::Version updateVersion = updateReq->GetUpdateVersion();
-
-	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, progInfo);
+	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, updateReq);
 
 	//NosUpdate::SendFile(TLSSocket, fileName);
 	//NosLog::CreateLog(NosLog::Severity::Debug, "Sent File");

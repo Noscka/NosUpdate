@@ -4,10 +4,13 @@
 
 namespace NosUpdate
 {
-	void UpdateResponse::GetUpdateFiles(const ProgramInfo& programInfo)
+	void UpdateResponse::GetUpdateFiles(const UpdateRequest::Ptr& updateRequest)
 	{
 		using namespace std::filesystem;
 		using namespace std;
+
+		ProgramInfo programInfo = updateRequest->GetProgramInfo();
+		std::vector<FileInfo> clientFile = updateRequest->GetCurrentFileInfo();
 
 		std::string programPath = programInfo.GetNormalizedName();
 

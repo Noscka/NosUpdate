@@ -69,7 +69,7 @@ NosUpdate::Version TLSClient::GetNewestVersion()
 
 void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
-	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1), "TestProgram");
+	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1), "TestProgram", "./");
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
 	NosUpdate::UpdateResponse::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);

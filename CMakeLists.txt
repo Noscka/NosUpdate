@@ -1,6 +1,7 @@
 ﻿cmake_minimum_required (VERSION 3.12)
 
 include("CMake/Versioning.cmake")
+include("CMake/CPM.cmake")
 
 Get_Git_Version()
 Get_Git_Branch()
@@ -27,8 +28,9 @@ endif()
 
 find_package(NosLib REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread serialization filesystem)
-find_package(OpenSSL REQUIRED Crypto SSL)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+find_package(OpenSSL REQUIRED Crypto SSL)
+CPMAddPackage("gh:rikyoz/bit7z@4.0.9")
 
 add_subdirectory(NosUpdateLib)
 
@@ -40,5 +42,5 @@ add_subdirectory(NosUpdateServer)
 add_subdirectory(NosUpdater)
 
 if(PROJECT_IS_TOP_LEVEL)
-	add_subdirectory("NosUpdateTester")
+	add_subdirectory(NosUpdateTester)
 endif()

@@ -1,22 +1,15 @@
 #pragma once
 #include "Response.hpp"
-#include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>
-#include <NosUpdate/BoostExpand/polymorphic_portable_binary_iarchive.hpp>
-#include <boost/serialization/unique_ptr.hpp>
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/access.hpp>
 
-#include <NosUpdate/Version.hpp>
+#include <boost/serialization/vector.hpp>
+#include <NosUpdate/Request/UpdateRequest.hpp>
 #include <NosUpdate/Info/FileInfo.hpp>
 #include <NosUpdate/Info/ProgramInfo.hpp>
-
-#include <NosLib/DynamicArray.hpp>
-#include <vector>
+#include <NosUpdate/Version.hpp>
 
 namespace NosUpdate
 {
+
 	class NOSUPDATE_API UpdateResponse : public Response
 	{
 	public:
@@ -36,14 +29,14 @@ namespace NosUpdate
 		Version UpdateVersion;
 		std::vector<FileInfo> UpdateFiles;
 
-		void GetUpdateFiles(const ProgramInfo&);
+		void GetUpdateFiles(const UpdateRequest::Ptr&);
 	public:
 		UpdateResponse() = default;
-		UpdateResponse(const Version& updateVersion, const ProgramInfo& programInf) :
+		UpdateResponse(const Version& updateVersion, const UpdateRequest::Ptr& updateRequest) :
 			Response(ResponseTypes::Version),
 			UpdateVersion(updateVersion)
 		{
-			GetUpdateFiles(programInf);
+			GetUpdateFiles(updateRequest);
 		}
 
 		~UpdateResponse() override = default;

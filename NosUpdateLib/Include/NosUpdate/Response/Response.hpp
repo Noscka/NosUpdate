@@ -1,5 +1,4 @@
 #pragma once
-
 #include "../WinVersion.hpp"
 
 #include <boost/asio.hpp>

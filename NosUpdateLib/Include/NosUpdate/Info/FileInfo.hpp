@@ -5,6 +5,8 @@
 
 #include <boost/filesystem.hpp>
 
+#include <NosLib/File.hpp>
+
 #include <string>
 
 namespace NosUpdate
@@ -37,9 +39,9 @@ namespace NosUpdate
 
 	public:
 		FileInfo() = default;
-		FileInfo(const std::string& fileName, const FileActions& fileAction) :
+		FileInfo(const std::string& fileName, const FileActions& fileAction = FileActions::Update) :
 			FileName(fileName),
-			Hash(CreateSHA256Hash(fileName)),
+			Hash(NosLib::File::GetHash(fileName, EVP_sha256())),
 			FileAction(fileAction),
 			FileSize(boost::filesystem::file_size(boost::filesystem::path(fileName)))
 		{}
@@ -48,9 +50,5 @@ namespace NosUpdate
 		std::string GetHash() const;
 		FileActions GetAction() const;
 		uint64_t GetSize() const;
-
-	private:
-		std::string CreateSHA256Hash(const std::string& filename) const;
-
 	};
 }
