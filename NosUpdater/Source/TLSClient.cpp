@@ -69,7 +69,7 @@ NosUpdate::Version TLSClient::GetNewestVersion()
 
 void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
-	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1), "TestProgram", "./");
+	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1), "TestProgram", "./TestProgram");
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
 	NosUpdate::UpdateResponse::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
@@ -85,9 +85,22 @@ void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 
 	for (NosUpdate::FileInfo& fileInfo : fileInfos)
 	{
-		NosLog::CreateLog(NosLog::Severity::Debug, "File Name: {} | File Hash: {} | File Size: {}",
+		std::string fileAction;
+
+		switch (fileInfo.GetAction())
+		{
+		case NosUpdate::FileInfo::FileActions::Update:
+			fileAction = "Update";
+			break;
+		case NosUpdate::FileInfo::FileActions::Delete:
+			fileAction = "Delete";
+			break;
+		}
+
+		NosLog::CreateLog(NosLog::Severity::Debug, "File Name: {} | File Action: {} | File Hash: {} | File Size: {}",
 						  fileInfo.GetName(),
-						  fileInfo.GetHash(),
+						  fileAction,
+						  fileInfo.GetHashString(),
 						  fileInfo.GetSize());
 	}
 

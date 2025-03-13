@@ -15,9 +15,14 @@ std::string NosUpdate::FileInfo::GetName() const
 	return FileName;
 }
 
-std::string NosUpdate::FileInfo::GetHash() const
+NosLib::Hash NosUpdate::FileInfo::GetHash() const
 {
-	return Hash;
+	return FileHash;
+}
+
+std::string NosUpdate::FileInfo::GetHashString() const
+{
+	return NosLib::GetHashString(FileHash);
 }
 
 NosUpdate::FileInfo::FileActions NosUpdate::FileInfo::GetAction() const

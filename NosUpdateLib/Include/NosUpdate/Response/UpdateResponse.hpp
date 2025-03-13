@@ -26,9 +26,13 @@ namespace NosUpdate
 		}
 
 	protected:
-		Version UpdateVersion;
-		std::vector<FileInfo> UpdateFiles;
+		using FileInfoVec = std::vector<FileInfo>;
 
+		Version UpdateVersion;
+		FileInfoVec UpdateFiles;
+
+		FileInfoVec GetLocalFiles(const UpdateRequest::Ptr&);
+		FileInfoVec GetFilesDifference(const FileInfoVec&, const FileInfoVec&);
 		void GetUpdateFiles(const UpdateRequest::Ptr&);
 	public:
 		UpdateResponse() = default;

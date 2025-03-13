@@ -2,12 +2,12 @@
 #include <NosUpdate/WinVersion.hpp>
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/access.hpp>
-
 #include <boost/filesystem.hpp>
 
 #include <NosLib/File.hpp>
 
 #include <string>
+#include <array>
 
 namespace NosUpdate
 {
@@ -26,14 +26,14 @@ namespace NosUpdate
 		void serialize(Archive& archive, const unsigned int)
 		{
 			archive& FileName;
-			archive& Hash;
+			archive& FileHash;
 			archive& FileAction;
 			archive& FileSize;
 		}
 
 	protected:
 		std::string FileName;
-		std::string Hash;
+		NosLib::Hash FileHash;
 		FileActions FileAction;
 		uint64_t FileSize;
 
@@ -41,13 +41,21 @@ namespace NosUpdate
 		FileInfo() = default;
 		FileInfo(const std::string& fileName, const FileActions& fileAction = FileActions::Update) :
 			FileName(fileName),
-			Hash(NosLib::File::GetHash(fileName, EVP_sha256())),
+			FileHash(NosLib::GetHash(fileName, EVP_sha256())),
 			FileAction(fileAction),
 			FileSize(boost::filesystem::file_size(boost::filesystem::path(fileName)))
 		{}
 
+		FileInfo(const FileInfo& other, const FileActions& fileAction) :
+			FileName(other.FileName),
+			FileHash(other.FileHash),
+			FileAction(fileAction),
+			FileSize(other.FileSize)
+		{ }
+
 		std::string GetName() const;
-		std::string GetHash() const;
+		NosLib::Hash GetHash() const;
+		std::string GetHashString() const;
 		FileActions GetAction() const;
 		uint64_t GetSize() const;
 	};
