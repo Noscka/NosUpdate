@@ -45,8 +45,12 @@ namespace NosUpdate
 			return "Request";
 		}
 
+		static void Serialize(const Base*, boost::asio::streambuf*);
 		static void Serialize(const Ptr&, boost::asio::streambuf*);
 		static Ptr Deserialize(boost::asio::streambuf*);
+
+	private:
+		static Base* DeserializeRaw(boost::asio::streambuf*);
 	};
 }
 

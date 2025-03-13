@@ -71,7 +71,7 @@ namespace NosUpdate
 	void SerializeSendPre(SyncWriteStream& socket, const typename Class::Ptr& classObject)
 	{
 		boost::asio::streambuf reqBuf;
-		Class::Base::Serialize(classObject, &reqBuf);
+		Class::Base::Serialize(static_cast<const typename Class::Base*>(classObject.get()), &reqBuf);
 		NosUpdate::SimpleWrite(socket, reqBuf);
 	}
 

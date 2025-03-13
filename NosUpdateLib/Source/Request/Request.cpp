@@ -16,31 +16,39 @@ namespace NosUpdate
 	{
 		switch (RequestType)
 		{
-			using enum RequestTypes;
-		case Version:
+		case RequestTypes::Version:
 			return "Version";
 
-		case Update:
+		case RequestTypes::Update:
 			return "Update";
-
-		default:
-			return "UNDEFINED";
 		}
+
+		return "UNDEFINED";
 	}
 
-	void Request::Serialize(const Ptr& objectPtr, boost::asio::streambuf* StreamBuf)
+	void Request::Serialize(const Request::Base* objectPtr, boost::asio::streambuf* streamBuf)
 	{
-		std::ostream os(StreamBuf);
+		std::ostream os(streamBuf);
 		NosUpdate::BoostExpand::portable_binary_oarchive oa(os);
 		oa << objectPtr;
 
 		NosLog::CreateLog(NosLog::Severity::Debug, "Serialized Request | Class Name: {} | Type Name: {}", objectPtr->GetRequestName(), objectPtr->GetRequestTypeName());
 	}
 
-	Request::Ptr Request::Deserialize(boost::asio::streambuf* StreamBuf)
+	void Request::Serialize(const Ptr& objectPtr, boost::asio::streambuf* streamBuf)
 	{
-		Ptr newObjectPtr;
-		std::istream is(StreamBuf);
+		return Serialize(objectPtr.get(), streamBuf);
+	}
+
+	Request::Ptr Request::Deserialize(boost::asio::streambuf* streamBuf)
+	{
+		return Ptr(DeserializeRaw(streamBuf));
+	}
+
+	Request::Base* Request::DeserializeRaw(boost::asio::streambuf* streamBuf)
+	{
+		Request::Base* newObjectPtr;
+		std::istream is(streamBuf);
 		NosUpdate::BoostExpand::portable_binary_iarchive ia(is);
 		ia >> newObjectPtr;
 
