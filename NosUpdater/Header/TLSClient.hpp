@@ -2,6 +2,8 @@
 #include <NosUpdate/WinVersion.hpp>
 #include <NosUpdate/Requests.hpp>
 #include <NosUpdate/Version.hpp>
+#include <NosUpdate/Requests.hpp>
+#include <NosUpdate/Responses.hpp>
 #include <NosLib/Logging.hpp>
 
 #include <boost/asio.hpp>
@@ -41,7 +43,8 @@ public:
 	virtual ~TLSClient() = default;
 protected:
 	NosUpdate::Version GetNewestVersion();
-	void RequestUpdate(const NosUpdate::Version&);
+	NosUpdate::UpdateResponse::Ptr RequestUpdate(const NosUpdate::Version&);
+	void ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr&);
 
 	TLSClient() = default;
 private:

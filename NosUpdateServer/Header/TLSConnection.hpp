@@ -1,6 +1,7 @@
 #pragma once
 #include <NosUpdate/WinVersion.hpp>
 #include <NosUpdate/Requests.hpp>
+#include <NosUpdate/Responses.hpp>
 #include <NosLib/Logging.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -36,6 +37,7 @@ protected:
 	void HandleRequest(NosUpdate::Request::Ptr&);
 	void HandleVersionRequest(NosUpdate::Request::Ptr&);
 	void HandleUpdateRequest(NosUpdate::Request::Ptr&);
+	void SendUpdateFiles(const NosUpdate::UpdateResponse::Ptr&);
 
 	TLSStream TLSSocket;
 

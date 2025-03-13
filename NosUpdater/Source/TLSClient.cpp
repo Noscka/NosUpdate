@@ -1,8 +1,6 @@
 #include "../Header/TLSClient.hpp"
 
 #include <NosUpdate/Helper.hpp>
-#include <NosUpdate/Requests.hpp>
-#include <NosUpdate/Responses.hpp>
 #include <NosUpdate/FileNet/FileReceive.hpp>
 
 #include <iostream>
@@ -43,10 +41,13 @@ void TLSClient::Connect()
 	NosLog::CreateLog(NosLog::Severity::Debug, "Endpoint: {}", GetRemoteEndpoint());
 }
 
+using UpRes = NosUpdate::UpdateResponse;
+
 void TLSClient::UpdateProgram()
 {
 	NosUpdate::Version newestVersion = GetNewestVersion();
-	RequestUpdate(newestVersion);
+	UpRes::Ptr updateRes = RequestUpdate(newestVersion);
+	ReceivedUpdateFiles(updateRes);
 }
 
 NosUpdate::Version TLSClient::GetNewestVersion()
@@ -67,21 +68,27 @@ NosUpdate::Version TLSClient::GetNewestVersion()
 	return versionRes->GetRequestedVersion();
 }
 
-void TLSClient::RequestUpdate(const NosUpdate::Version& version)
+UpRes::Ptr TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
-	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, NosUpdate::Version(0, 0, 1), "TestProgram", "./TestProgram");
+	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, version, "TestProgram", "./TestProgram");
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
-	NosUpdate::UpdateResponse::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
+	UpRes::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
 
 	if (!updateRes)
 	{
 		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Response");
-		return;
+		return updateRes; /* Will be nullptr */
 	}
-	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
 
 	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | Version: {}", updateRes->GetUpdateVersion().GetVersion());
+	
+	return updateRes;
+}
+
+void TLSClient::ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr& updateRes)
+{
+	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
 
 	for (NosUpdate::FileInfo& fileInfo : fileInfos)
 	{
@@ -97,13 +104,14 @@ void TLSClient::RequestUpdate(const NosUpdate::Version& version)
 			break;
 		}
 
-		NosLog::CreateLog(NosLog::Severity::Debug, "File Name: {} | File Action: {} | File Hash: {} | File Size: {}",
-						  fileInfo.GetName(),
-						  fileAction,
-						  fileInfo.GetHashString(),
-						  fileInfo.GetSize());
-	}
+		NosLog::CreateLog(NosLog::Severity::Info, "Receiving file: File Name: {} | File Action: {}", fileInfo.GetName(), fileAction);
+		NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", fileInfo.GetHashString(), fileInfo.GetSize());
 
-	//NosUpdate::ReceiveFile(TLSSocket, fileInfo.GetName(), fileInfo.GetSize());
-	//NosLog::CreateLog(NosLog::Severity::Debug, "Received File");
+		if (fileInfo.GetAction() != NosUpdate::FileInfo::FileActions::Update)
+		{
+			continue;
+		}
+
+		NosUpdate::ReceiveFile(TLSSocket, fileInfo.GetName(), fileInfo.GetSize());
+	}
 }

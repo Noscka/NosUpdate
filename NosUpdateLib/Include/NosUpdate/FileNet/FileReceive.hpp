@@ -1,6 +1,7 @@
 #pragma once
 #include <NosUpdate/Definitions.hpp>
 
+#include <boost/filesystem.hpp>
 #include <boost/asio/ssl.hpp>
 #include <boost/asio.hpp>
 
@@ -11,6 +12,12 @@ namespace NosUpdate
 	template<typename SyncWriteStream>
 	inline void ReceiveFile(SyncWriteStream& socket, const std::string& filename, uint64_t expectedContentsize, const uint64_t& resumePos = 0)
 	{
+		namespace bfilesys = boost::filesystem;
+
+		bfilesys::path filePath(filename);
+		bfilesys::path parentDir(filePath.parent_path());
+		bfilesys::create_directories(parentDir);
+
 		std::ofstream oFStream(filename, std::ios::binary | std::ios::trunc);
 
 		expectedContentsize -= resumePos;
@@ -39,7 +46,5 @@ namespace NosUpdate
 		}
 
 		oFStream.close();
-
-		return;
 	}
 }

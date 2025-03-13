@@ -1,5 +1,4 @@
 #include "../Header/TLSConnection.hpp"
-#include <NosUpdate/Responses.hpp>
 
 #include <NosUpdate/Helper.hpp>
 #include <NosUpdate/FileNet/FileSend.hpp>
@@ -110,11 +109,40 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 					  updateReq->GetUpdateVersion().GetVersion(),
 					  progInfo.GetNormalizedName());
 
-	//std::string fileName = "TestData.txt";
-
 	NosUpdate::Version updateVersion = updateReq->GetUpdateVersion();
-	NosUpdate::SerializeSend<NosUpdate::UpdateResponse>(TLSSocket, updateVersion, updateReq);
 
-	//NosUpdate::SendFile(TLSSocket, fileName);
-	//NosLog::CreateLog(NosLog::Severity::Debug, "Sent File");
+	NosUpdate::UpdateResponse::Ptr updatRes(new NosUpdate::UpdateResponse(updateVersion, updateReq));
+	NosUpdate::SerializeSendPre<NosUpdate::UpdateResponse>(TLSSocket, updatRes);
+
+	SendUpdateFiles(updatRes);
+}
+
+void TLSConnection::SendUpdateFiles(const NosUpdate::UpdateResponse::Ptr& updateRes)
+{
+	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
+
+	for (NosUpdate::FileInfo& fileInfo : fileInfos)
+	{
+		std::string fileAction;
+
+		switch (fileInfo.GetAction())
+		{
+		case NosUpdate::FileInfo::FileActions::Update:
+			fileAction = "Update";
+			break;
+		case NosUpdate::FileInfo::FileActions::Delete:
+			fileAction = "Delete";
+			break;
+		}
+
+		NosLog::CreateLog(NosLog::Severity::Info, "File: File Name: {} | File Action: {}", fileInfo.GetName(), fileAction);
+		NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", fileInfo.GetHashString(), fileInfo.GetSize());
+
+		if (fileInfo.GetAction() != NosUpdate::FileInfo::FileActions::Update)
+		{
+			continue;
+		}
+
+		NosUpdate::SendFile(TLSSocket, fileInfo.GetName());
+	}
 }
