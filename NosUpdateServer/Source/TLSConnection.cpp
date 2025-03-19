@@ -30,20 +30,29 @@ std::string TLSConnection::GetRemoteEndpoint()
 
 void TLSConnection::start()
 {
-	boost::system::error_code error;
-	TLSSocket.handshake(bSSL::stream_base::server, error);
-	if (error)
+	try /* Temporary. Best to think of a better solution */
 	{
-		NosLog::CreateLog(NosLog::Severity::Error, "Closing connection with {} | Handshake error: {}", GetRemoteEndpoint(), error.message());
-		return;
+		boost::system::error_code error;
+		TLSSocket.handshake(bSSL::stream_base::server, error);
+		if (error)
+		{
+			NosLog::CreateLog(NosLog::Severity::Error, "Closing connection with {} | Handshake error: {}", GetRemoteEndpoint(), error.message());
+			return;
+		}
+
+		NosLog::CreateLog(NosLog::Severity::Info, "Client succesfully connected from {}", GetRemoteEndpoint());
+
+		while (!error)
+		{
+			NosUpdate::Request::Ptr clientsRequest = GetClientsRequest();
+			HandleRequest(clientsRequest);
+		}
 	}
-
-	NosLog::CreateLog(NosLog::Severity::Info, "Client succesfully connected from {}", GetRemoteEndpoint());
-
-	while (!error)
+	catch (std::exception& e)
 	{
-		NosUpdate::Request::Ptr clientsRequest = GetClientsRequest();
-		HandleRequest(clientsRequest);
+		NosLog::CreateLog(NosLog::Severity::Error, "Error with Connection: {}", e.what());
+		delete this;
+		return;
 	}
 }
 

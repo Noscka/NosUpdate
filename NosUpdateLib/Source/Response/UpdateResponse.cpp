@@ -1,5 +1,7 @@
 #include <NosUpdate/Response/UpdateResponse.hpp>
 
+#include <NosLib/File.hpp>
+
 #include <filesystem>
 #include <algorithm>
 
@@ -21,7 +23,7 @@ namespace NosUpdate
 
 			std::string filePath = i->path().string();
 
-			FileInfo newFile(filePath, FileInfo::FileActions::Update);
+			FileInfo newFile(filePath);
 
 			serverSideFiles.push_back(newFile);
 		}
@@ -57,24 +59,24 @@ namespace NosUpdate
 			const FileInfo& clientFile = clientFiles[i];
 			const FileInfo& serverFile = serverFiles[j];
 
-			filesys::path clientFilePath(clientFile.GetName());
-			filesys::path serverFilePath(serverFile.GetName());
+			std::string clientPathNormalized = NosLib::File::NormalizePath(clientFile.GetName());
+			std::string serverPathNormalized = NosLib::File::NormalizePath(serverFile.GetName());
 
-			clientFilePath = clientFilePath.lexically_normal();
-			serverFilePath = serverFilePath.lexically_normal();
+			filesys::path clientFilePath = filesys::path(clientPathNormalized).lexically_normal().make_preferred();
+			filesys::path serverFilePath = filesys::path(serverPathNormalized).lexically_normal().make_preferred();
 
 			/* Only Client Has | Deduced from server file path value being larger the client */
-			if (clientFilePath > serverFilePath)
+			if (clientFilePath < serverFilePath)
 			{
-				updateFiles.push_back(FileInfo(clientFiles[i], FileInfo::FileActions::Delete));
+				updateFiles.push_back(FileInfo(clientFile, FileInfo::FileActions::Delete));
 				i++;
 				continue;
 			}
 
-			/* Only Client Has | Deduced from client file path value being larger the server */
-			if (clientFilePath < serverFilePath)
+			/* Only Server Has | Deduced from server file path value being larger the server */
+			if (clientFilePath > serverFilePath)
 			{
-				updateFiles.push_back(FileInfo(serverFiles[j], FileInfo::FileActions::Update));
+				updateFiles.push_back(FileInfo(serverFile, FileInfo::FileActions::Update));
 				j++;
 				continue;
 			}
@@ -91,7 +93,7 @@ namespace NosUpdate
 				continue;
 			}
 
-			updateFiles.push_back(FileInfo(serverFiles[i], FileInfo::FileActions::Update));
+			updateFiles.push_back(FileInfo(serverFile, FileInfo::FileActions::Update));
 			i++; j++;
 		}
 

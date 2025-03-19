@@ -31,7 +31,7 @@ int main()
 	ssl_context.load_verify_file("server.crt");
 	ssl_context.set_default_verify_paths();
 
-	#if 1
+	#if 0
 	std::string hostName = GetServerHostName();
 	#else
 	std::string hostName = Definitions::UpdateHostname;

@@ -57,6 +57,7 @@ namespace NosUpdate
 		NosLib::Hash GetHash() const;
 		std::string GetHashString() const;
 		FileActions GetAction() const;
+		std::string GetActionName() const;
 		uint64_t GetSize() const;
 	};
 }

@@ -45,6 +45,7 @@ protected:
 	NosUpdate::Version GetNewestVersion();
 	NosUpdate::UpdateResponse::Ptr RequestUpdate(const NosUpdate::Version&);
 	void ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr&);
+	void ProcessUpdateFile(const NosUpdate::FileInfo&);
 
 	TLSClient() = default;
 private:

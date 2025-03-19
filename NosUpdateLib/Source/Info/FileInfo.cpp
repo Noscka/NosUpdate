@@ -10,27 +10,42 @@
 #include <vector>
 #include <stdexcept>
 
-std::string NosUpdate::FileInfo::GetName() const
+namespace NosUpdate
 {
-	return FileName;
-}
+	std::string FileInfo::GetName() const
+	{
+		return FileName;
+	}
 
-NosLib::Hash NosUpdate::FileInfo::GetHash() const
-{
-	return FileHash;
-}
+	NosLib::Hash FileInfo::GetHash() const
+	{
+		return FileHash;
+	}
 
-std::string NosUpdate::FileInfo::GetHashString() const
-{
-	return NosLib::GetHashString(FileHash);
-}
+	std::string FileInfo::GetHashString() const
+	{
+		return NosLib::GetHashString(FileHash);
+	}
 
-NosUpdate::FileInfo::FileActions NosUpdate::FileInfo::GetAction() const
-{
-	return FileAction;
-}
+	FileInfo::FileActions FileInfo::GetAction() const
+	{
+		return FileAction;
+	}
 
-uint64_t NosUpdate::FileInfo::GetSize() const
-{
-	return FileSize;
+	std::string FileInfo::GetActionName() const
+	{
+		switch (GetAction())
+		{
+		case FileActions::Update:
+			return "Update";
+		case FileActions::Delete:
+			return "Delete";
+		}
+		return "UNDEFINED";
+	}
+
+	uint64_t FileInfo::GetSize() const
+	{
+		return FileSize;
+	}
 }

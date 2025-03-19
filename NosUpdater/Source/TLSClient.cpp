@@ -1,9 +1,12 @@
 #include "../Header/TLSClient.hpp"
 
+#include <NosLib/ErrorHandling.hpp>
+
 #include <NosUpdate/Helper.hpp>
 #include <NosUpdate/FileNet/FileReceive.hpp>
 
 #include <iostream>
+#include <filesystem>
 
 TLSClient::TLSStream& TLSClient::GetTLSSocket()
 {
@@ -27,15 +30,25 @@ std::string TLSClient::GetRemoteEndpoint()
 
 void TLSClient::Connect()
 {
+	boost::system::error_code error;
+
 	/*
 	Connects to the function using `resolver` which resolves the address e.g. (Noscka.com -> 123.123.123.123)
 	Host - Hostname/ip address
 	Service - Service(Hostname for ports)/Port number
 	*/
-	boost::asio::connect(GetSocket(), boost::asio::ip::tcp::resolver(IOContext).resolve(Hostname.c_str(), std::to_string(Port)));
+	auto resolvedEndpoint = boost::asio::ip::tcp::resolver(IOContext).resolve(Hostname.c_str(), std::to_string(Port), error);
+
+	NOSLOG_ASSERT(error, return, NosLog::Severity::Error, "Unable to resolve endpoint | {}", error.message());
+
+	boost::asio::connect(GetSocket(), resolvedEndpoint, error);
+
+	NOSLOG_ASSERT(error, return, NosLog::Severity::Error, "Unabled to connect to endpoint | {}", error.message());
 
 	TLSSocket.set_verify_mode(boost::asio::ssl::verify_peer);
-	TLSSocket.handshake(boost::asio::ssl::stream_base::client);
+	TLSSocket.handshake(boost::asio::ssl::stream_base::client, error);
+
+	NOSLOG_ASSERT(error, return, NosLog::Severity::Error, "Closing connection with {} | Handshake error: {}", GetRemoteEndpoint(), error.message());
 
 	NosLog::CreateLog(NosLog::Severity::Info, "Succesfully connected to: {}:{}", Hostname, Port);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Endpoint: {}", GetRemoteEndpoint());
@@ -92,26 +105,28 @@ void TLSClient::ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr& update
 
 	for (NosUpdate::FileInfo& fileInfo : fileInfos)
 	{
-		std::string fileAction;
+		ProcessUpdateFile(fileInfo);
+	}
+}
 
-		switch (fileInfo.GetAction())
-		{
-		case NosUpdate::FileInfo::FileActions::Update:
-			fileAction = "Update";
-			break;
-		case NosUpdate::FileInfo::FileActions::Delete:
-			fileAction = "Delete";
-			break;
-		}
 
-		NosLog::CreateLog(NosLog::Severity::Info, "Receiving file: File Name: {} | File Action: {}", fileInfo.GetName(), fileAction);
-		NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", fileInfo.GetHashString(), fileInfo.GetSize());
+void TLSClient::ProcessUpdateFile(const NosUpdate::FileInfo& updateFile)
+{
+	NosLog::CreateLog(NosLog::Severity::Info, "Receiving file: File Name: {} | File Action: {}", updateFile.GetName(), updateFile.GetActionName());
+	NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", updateFile.GetHashString(), updateFile.GetSize());
 
-		if (fileInfo.GetAction() != NosUpdate::FileInfo::FileActions::Update)
-		{
-			continue;
-		}
+	switch (updateFile.GetAction())
+	{
+	case NosUpdate::FileInfo::FileActions::Update:
+		NosUpdate::ReceiveFile(TLSSocket, updateFile.GetName(), updateFile.GetSize());
+		break;
 
-		NosUpdate::ReceiveFile(TLSSocket, fileInfo.GetName(), fileInfo.GetSize());
+	case NosUpdate::FileInfo::FileActions::Delete:
+		std::filesystem::remove(updateFile.GetName());
+		break;
+
+	default:
+		NosLog::CreateLog(NosLog::Severity::Warning, "File Action {} doesn't have a case", updateFile.GetActionName());
+		break;
 	}
 }

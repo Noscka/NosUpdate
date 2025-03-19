@@ -30,7 +30,7 @@ find_package(NosLib REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread serialization filesystem)
 INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
 find_package(OpenSSL REQUIRED Crypto SSL)
-CPMAddPackage("gh:rikyoz/bit7z@4.0.9")
+#CPMAddPackage("gh:rikyoz/bit7z@4.0.9") #Not even used right now
 
 add_subdirectory(NosUpdateLib)
 
