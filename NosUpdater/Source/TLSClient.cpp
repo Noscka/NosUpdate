@@ -28,7 +28,7 @@ std::string TLSClient::GetRemoteEndpoint()
 	return NosUpdate::EndpointAsString(GetSocket().remote_endpoint());
 }
 
-void TLSClient::Connect()
+NosLib::Result<void> TLSClient::Connect()
 {
 	boost::system::error_code error;
 
@@ -39,81 +39,90 @@ void TLSClient::Connect()
 	*/
 	auto resolvedEndpoint = boost::asio::ip::tcp::resolver(IOContext).resolve(Hostname.c_str(), std::to_string(Port), error);
 
-	NOSLOG_ASSERT(error, return, NosLog::Severity::Error, "Unable to resolve endpoint | {}", error.message());
+	NOSLOG_ASSERT(error, return NosUpdate::NetErrors::Unresolve, NosLog::Severity::Error, "Unable to resolve endpoint | {}", error.message());
 
 	boost::asio::connect(GetSocket(), resolvedEndpoint, error);
 
-	NOSLOG_ASSERT(error, return, NosLog::Severity::Error, "Unabled to connect to endpoint | {}", error.message());
+	NOSLOG_ASSERT(error, return NosUpdate::NetErrors::Unconnectable, NosLog::Severity::Error, "Unabled to connect to endpoint | {}", error.message());
 
 	TLSSocket.set_verify_mode(boost::asio::ssl::verify_peer);
 	TLSSocket.handshake(boost::asio::ssl::stream_base::client, error);
 
-	NOSLOG_ASSERT(error, return, NosLog::Severity::Error, "Closing connection with {} | Handshake error: {}", GetRemoteEndpoint(), error.message());
+	NOSLOG_ASSERT(error, return NosUpdate::NetErrors::Handshake, NosLog::Severity::Error, "Closing connection with {} | Handshake error: {}", GetRemoteEndpoint(), error.message());
 
 	NosLog::CreateLog(NosLog::Severity::Info, "Succesfully connected to: {}:{}", Hostname, Port);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Endpoint: {}", GetRemoteEndpoint());
+
+	return {};
 }
 
 using UpRes = NosUpdate::UpdateResponse;
 
-void TLSClient::UpdateProgram()
+NosLib::Result<void> TLSClient::UpdateProgram()
 {
-	NosUpdate::Version newestVersion = GetNewestVersion();
-	UpRes::Ptr updateRes = RequestUpdate(newestVersion);
+	NosLib::Result<NosUpdate::Version> newestVersion = GetNewestVersion();
+	NOS_ASSERT(!newestVersion, return newestVersion.ErrorCode());
+
+	NosLib::Result<UpRes::Ptr> updateRes = RequestUpdate(newestVersion);
+	NOS_ASSERT(!updateRes, return updateRes.ErrorCode());
+
 	ReceivedUpdateFiles(updateRes);
+	return {};
 }
 
-NosUpdate::Version TLSClient::GetNewestVersion()
+NosLib::Result<NosUpdate::Version> TLSClient::GetNewestVersion()
 {
 	NosUpdate::SerializeSend<NosUpdate::VersionRequest>(TLSSocket, NosUpdate::VersionRequest::VersionTypes::Newest);
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Newest Version");
 
 	NosUpdate::VersionResponse::Ptr versionRes = NosUpdate::DeserializeRead<NosUpdate::VersionResponse>(TLSSocket);
 
-	if (!versionRes)
-	{
-		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Version Response");
-		return NosUpdate::Version();
-	}
+	NOSLOG_ASSERT(!versionRes, return NosLib::GenericErrors::Casting, NosLog::Severity::Error, "Unable to cast to Version Response");
 
 	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded with {} Version", versionRes->GetRequestedVersion().GetVersion());
 
 	return versionRes->GetRequestedVersion();
 }
 
-UpRes::Ptr TLSClient::RequestUpdate(const NosUpdate::Version& version)
+NosLib::Result<UpRes::Ptr> TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
 	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, version, "TestProgram", "./TestProgram");
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
 	UpRes::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
 
-	if (!updateRes)
-	{
-		NosLog::CreateLog(NosLog::Severity::Error, "Unable to cast to Update Response");
-		return updateRes; /* Will be nullptr */
-	}
+	NOSLOG_ASSERT(!updateRes, return NosLib::GenericErrors::Casting, NosLog::Severity::Error, "Unable to cast to Update Response");
 
 	NosLog::CreateLog(NosLog::Severity::Debug, "Server Responded Update | Version: {}", updateRes->GetUpdateVersion().GetVersion());
 	
 	return updateRes;
 }
 
-void TLSClient::ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr& updateRes)
+NosLib::Result<void> TLSClient::ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr& updateRes)
 {
 	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
 
 	for (NosUpdate::FileInfo& fileInfo : fileInfos)
 	{
-		ProcessUpdateFile(fileInfo);
+		NosLib::Result<void> processingRes = ProcessUpdateFile(fileInfo);
+
+		/* If there was some problem */
+		if (!processingRes)
+		{
+			return processingRes;
+		}
 	}
+
+	return {};
 }
 
 
-void TLSClient::ProcessUpdateFile(const NosUpdate::FileInfo& updateFile)
+NosLib::Result<void> TLSClient::ProcessUpdateFile(const NosUpdate::FileInfo& updateFile)
 {
 	NosLog::CreateLog(NosLog::Severity::Info, "Receiving file: File Name: {} | File Action: {}", updateFile.GetName(), updateFile.GetActionName());
 	NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", updateFile.GetHashString(), updateFile.GetSize());
+
+	std::error_code ec;
 
 	switch (updateFile.GetAction())
 	{
@@ -122,11 +131,13 @@ void TLSClient::ProcessUpdateFile(const NosUpdate::FileInfo& updateFile)
 		break;
 
 	case NosUpdate::FileInfo::FileActions::Delete:
-		std::filesystem::remove(updateFile.GetName());
+		std::filesystem::remove(updateFile.GetName(), ec);
 		break;
 
 	default:
 		NosLog::CreateLog(NosLog::Severity::Warning, "File Action {} doesn't have a case", updateFile.GetActionName());
 		break;
 	}
+
+	return {};
 }

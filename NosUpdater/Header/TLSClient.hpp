@@ -4,7 +4,9 @@
 #include <NosUpdate/Version.hpp>
 #include <NosUpdate/Requests.hpp>
 #include <NosUpdate/Responses.hpp>
+#include <NosUpdate/ErrorCodes.hpp>
 #include <NosLib/Logging.hpp>
+#include <NosLib/ErrorHandling.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -37,15 +39,15 @@ public:
 	std::string GetLocalEndpoint();
 	std::string GetRemoteEndpoint();
 
-	void Connect(); /* Connects to server */
-	void UpdateProgram();
+	NosLib::Result<void> Connect(); /* Connects to server */
+	NosLib::Result<void> UpdateProgram();
 
 	virtual ~TLSClient() = default;
 protected:
-	NosUpdate::Version GetNewestVersion();
-	NosUpdate::UpdateResponse::Ptr RequestUpdate(const NosUpdate::Version&);
-	void ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr&);
-	void ProcessUpdateFile(const NosUpdate::FileInfo&);
+	NosLib::Result<NosUpdate::Version> GetNewestVersion();
+	NosLib::Result<NosUpdate::UpdateResponse::Ptr> RequestUpdate(const NosUpdate::Version&);
+	NosLib::Result<void> ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr&);
+	NosLib::Result<void> ProcessUpdateFile(const NosUpdate::FileInfo&);
 
 	TLSClient() = default;
 private:

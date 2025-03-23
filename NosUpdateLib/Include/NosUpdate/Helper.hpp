@@ -60,7 +60,7 @@ namespace NosUpdate
 	template <class Class, class ... ClassArgs, typename SyncWriteStream>
 	void SerializeSend(SyncWriteStream& socket, ClassArgs&& ... args)
 	{
-		typename Class::Base::Ptr outObject(new Class(std::forward<ClassArgs>(args)...));
+		typename Class::Base::Ptr outObject = std::make_unique<Class>(std::forward<ClassArgs>(args)...);
 
 		boost::asio::streambuf reqBuf;
 		Class::Base::Serialize(outObject, &reqBuf);
