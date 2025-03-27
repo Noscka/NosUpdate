@@ -1,5 +1,5 @@
 #pragma once
-#include <NosUpdate/WinVersion.hpp>
+#include <NosLib/Boost/WinVersion.hpp>
 #include <NosUpdate/Requests.hpp>
 #include <NosUpdate/Version.hpp>
 #include <NosUpdate/Requests.hpp>
@@ -47,7 +47,7 @@ protected:
 	NosLib::Result<NosUpdate::Version> GetNewestVersion();
 	NosLib::Result<NosUpdate::UpdateResponse::Ptr> RequestUpdate(const NosUpdate::Version&);
 	NosLib::Result<void> ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr&);
-	NosLib::Result<void> ProcessUpdateFile(const NosUpdate::FileInfo&);
+	NosLib::Result<void> ProcessUpdateFile(const NosLib::Net::FileInfo&);
 
 	TLSClient() = default;
 private:

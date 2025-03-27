@@ -1,4 +1,4 @@
-#include <NosUpdate/WinVersion.hpp>
+#include <NosLib/Boost/WinVersion.hpp>
 #include <NosUpdate/Definitions.hpp>
 
 #include "Header/TLSServer.hpp"
@@ -20,7 +20,7 @@ int main()
 	ssl_context.use_private_key_file("server.pem", boost::asio::ssl::context::pem);
 	ssl_context.use_tmp_dh_file("dh2048.pem");
 
-	TLSServer updateServer(io_context, ssl_context, Definitions::UpdatePort);
+	TLSServer updateServer(io_context, ssl_context, NosUpdate::Definitions::UpdatePort);
 
 	updateServer.AcceptLoop();
 	

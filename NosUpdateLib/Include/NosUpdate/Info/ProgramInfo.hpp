@@ -1,5 +1,6 @@
 #pragma once
-#include <NosUpdate/WinVersion.hpp>
+#include <NosLib/Boost/WinVersion.hpp>
+#include <NosUpdate/Internal/Export.hpp>
 
 #include <boost/serialization/unique_ptr.hpp>
 #include <boost/serialization/access.hpp>

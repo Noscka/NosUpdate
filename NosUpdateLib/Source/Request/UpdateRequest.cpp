@@ -17,7 +17,7 @@ namespace NosUpdate
 
 			std::string filePath = i->path().string();
 
-			FileInfo newFile(filePath);
+			NosLib::Net::FileInfo newFile(filePath);
 
 			CurrentFiles.push_back(newFile);
 		}
@@ -33,7 +33,7 @@ namespace NosUpdate
 		return ProgramInfoObj;
 	}
 
-	std::vector<FileInfo> UpdateRequest::GetCurrentFileInfo() const
+	std::vector<NosLib::Net::FileInfo> UpdateRequest::GetCurrentFileInfo() const
 	{
 		return CurrentFiles;
 	}

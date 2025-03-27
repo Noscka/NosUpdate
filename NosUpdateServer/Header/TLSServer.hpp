@@ -1,5 +1,5 @@
 #pragma once
-#include <NosUpdate/WinVersion.hpp>
+#include <NosLib/Boost/WinVersion.hpp>
 #include <NosLib/Logging.hpp>
 
 #include <boost/asio.hpp>

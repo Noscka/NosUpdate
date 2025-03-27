@@ -3,7 +3,7 @@
 
 #include <boost/serialization/vector.hpp>
 #include <NosUpdate/Request/UpdateRequest.hpp>
-#include <NosUpdate/Info/FileInfo.hpp>
+#include <NosLib/Net/FileInfo.hpp>
 #include <NosUpdate/Info/ProgramInfo.hpp>
 #include <NosUpdate/Version.hpp>
 
@@ -26,7 +26,7 @@ namespace NosUpdate
 		}
 
 	protected:
-		using FileInfoVec = std::vector<FileInfo>;
+		using FileInfoVec = std::vector<NosLib::Net::FileInfo>;
 
 		Version UpdateVersion;
 		FileInfoVec UpdateFiles;
@@ -51,7 +51,7 @@ namespace NosUpdate
 		}
 
 		Version GetUpdateVersion() const;
-		std::vector<FileInfo> GetUpdateFileInfo() const;
+		std::vector<NosLib::Net::FileInfo> GetUpdateFileInfo() const;
 	};
 }
 

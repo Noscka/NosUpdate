@@ -23,7 +23,7 @@ namespace NosUpdate
 
 			std::string filePath = i->path().string();
 
-			FileInfo newFile(filePath);
+			NosLib::Net::FileInfo newFile(filePath);
 
 			serverSideFiles.push_back(newFile);
 		}
@@ -43,7 +43,7 @@ namespace NosUpdate
 			/* Only Client Has | Deduced from server being out of files */
 			if (i < clientFiles.size() && j >= serverFiles.size())
 			{
-				updateFiles.push_back(FileInfo(clientFiles[i], FileInfo::FileActions::Delete));
+				updateFiles.push_back(NosLib::Net::FileInfo(clientFiles[i], NosLib::Net::FileInfo::FileActions::Delete));
 				i++;
 				continue;
 			}
@@ -51,13 +51,13 @@ namespace NosUpdate
 			/* Only Server Has | Deduced from client being out of files */
 			if (j < serverFiles.size() && i >= clientFiles.size())
 			{
-				updateFiles.push_back(FileInfo(serverFiles[j], FileInfo::FileActions::Update));
+				updateFiles.push_back(NosLib::Net::FileInfo(serverFiles[j], NosLib::Net::FileInfo::FileActions::Update));
 				j++;
 				continue;
 			}
 
-			const FileInfo& clientFile = clientFiles[i];
-			const FileInfo& serverFile = serverFiles[j];
+			const NosLib::Net::FileInfo& clientFile = clientFiles[i];
+			const NosLib::Net::FileInfo& serverFile = serverFiles[j];
 
 			std::string clientPathNormalized = NosLib::File::NormalizePath(clientFile.GetName());
 			std::string serverPathNormalized = NosLib::File::NormalizePath(serverFile.GetName());
@@ -68,7 +68,7 @@ namespace NosUpdate
 			/* Only Client Has | Deduced from server file path value being larger the client */
 			if (clientFilePath < serverFilePath)
 			{
-				updateFiles.push_back(FileInfo(clientFile, FileInfo::FileActions::Delete));
+				updateFiles.push_back(NosLib::Net::FileInfo(clientFile, NosLib::Net::FileInfo::FileActions::Delete));
 				i++;
 				continue;
 			}
@@ -76,7 +76,7 @@ namespace NosUpdate
 			/* Only Server Has | Deduced from server file path value being larger the server */
 			if (clientFilePath > serverFilePath)
 			{
-				updateFiles.push_back(FileInfo(serverFile, FileInfo::FileActions::Update));
+				updateFiles.push_back(NosLib::Net::FileInfo(serverFile, NosLib::Net::FileInfo::FileActions::Update));
 				j++;
 				continue;
 			}
@@ -93,7 +93,7 @@ namespace NosUpdate
 				continue;
 			}
 
-			updateFiles.push_back(FileInfo(serverFile, FileInfo::FileActions::Update));
+			updateFiles.push_back(NosLib::Net::FileInfo(serverFile, NosLib::Net::FileInfo::FileActions::Update));
 			i++; j++;
 		}
 
@@ -104,7 +104,7 @@ namespace NosUpdate
 	{
 		FileInfoVec serverSideFiles = GetLocalFiles(updateRequest);
 
-		auto cmp = [](const FileInfo& a, const FileInfo& b)
+		auto cmp = [](const NosLib::Net::FileInfo& a, const NosLib::Net::FileInfo& b)
 		{
 			namespace filesys = std::filesystem;
 			filesys::path aPath(a.GetName());
@@ -127,7 +127,7 @@ namespace NosUpdate
 		return UpdateVersion;
 	}
 
-	std::vector<FileInfo> UpdateResponse::GetUpdateFileInfo() const
+	std::vector<NosLib::Net::FileInfo> UpdateResponse::GetUpdateFileInfo() const
 	{
 		return UpdateFiles;
 	}

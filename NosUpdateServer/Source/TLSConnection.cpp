@@ -1,7 +1,7 @@
 #include "../Header/TLSConnection.hpp"
 
-#include <NosUpdate/Helper.hpp>
-#include <NosUpdate/FileNet/FileSend.hpp>
+#include <NosLib/Net/Helper.hpp>
+#include <NosLib/Net/FileSend.hpp>
 
 TLSConnection* TLSConnection::CreateConnection(boost::asio::io_context& io_context, bSSL::context& ssl_context)
 {
@@ -20,12 +20,12 @@ TLSConnection::TCPStream& TLSConnection::GetSocket()
 
 std::string TLSConnection::GetLocalEndpoint()
 {
-	return NosUpdate::EndpointAsString(GetSocket().local_endpoint());
+	return NosLib::Net::EndpointAsString(GetSocket().local_endpoint());
 }
 
 std::string TLSConnection::GetRemoteEndpoint()
 {
-	return NosUpdate::EndpointAsString(GetSocket().remote_endpoint());
+	return NosLib::Net::EndpointAsString(GetSocket().remote_endpoint());
 }
 
 void TLSConnection::start()
@@ -61,7 +61,7 @@ NosUpdate::Request::Ptr TLSConnection::GetClientsRequest()
 	NosUpdate::Request::Ptr clientsRequest;
 
 	boost::asio::streambuf reqBuf;
-	NosUpdate::SimpleRead(TLSSocket, reqBuf);
+	NosLib::Net::SimpleRead(TLSSocket, reqBuf);
 	NosLog::CreateLog(NosLog::Severity::Debug, "Got Client Request");
 	clientsRequest = NosUpdate::Request::Deserialize(&reqBuf);
 
@@ -97,7 +97,7 @@ void TLSConnection::HandleVersionRequest(NosUpdate::Request::Ptr& clientsRequest
 	NosLog::CreateLog(NosLog::Severity::Info, "Client Requested {} Version", versionReq->GetVersionTypeName());
 
 	NosUpdate::Version updateVersion(0, 0, 1);
-	NosUpdate::SerializeSend<NosUpdate::VersionResponse>(TLSSocket, updateVersion);
+	NosLib::Net::SerializeSend<NosUpdate::VersionResponse>(TLSSocket, updateVersion);
 
 	NosLog::CreateLog(NosLog::Severity::Info, "Responded Newest Version | version: {}", updateVersion.GetVersion());
 }
@@ -121,25 +121,25 @@ void TLSConnection::HandleUpdateRequest(NosUpdate::Request::Ptr& clientsRequest)
 	NosUpdate::Version updateVersion = updateReq->GetUpdateVersion();
 
 	NosUpdate::UpdateResponse::Ptr updatRes(new NosUpdate::UpdateResponse(updateVersion, updateReq));
-	NosUpdate::SerializeSendPre<NosUpdate::UpdateResponse>(TLSSocket, updatRes);
+	NosLib::Net::SerializeSendPre<NosUpdate::UpdateResponse>(TLSSocket, updatRes);
 
 	SendUpdateFiles(updatRes);
 }
 
 void TLSConnection::SendUpdateFiles(const NosUpdate::UpdateResponse::Ptr& updateRes)
 {
-	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
+	std::vector<NosLib::Net::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
 
-	for (NosUpdate::FileInfo& fileInfo : fileInfos)
+	for (NosLib::Net::FileInfo& fileInfo : fileInfos)
 	{
 		std::string fileAction;
 
 		switch (fileInfo.GetAction())
 		{
-		case NosUpdate::FileInfo::FileActions::Update:
+		case NosLib::Net::FileInfo::FileActions::Update:
 			fileAction = "Update";
 			break;
-		case NosUpdate::FileInfo::FileActions::Delete:
+		case NosLib::Net::FileInfo::FileActions::Delete:
 			fileAction = "Delete";
 			break;
 		}
@@ -147,11 +147,11 @@ void TLSConnection::SendUpdateFiles(const NosUpdate::UpdateResponse::Ptr& update
 		NosLog::CreateLog(NosLog::Severity::Info, "File: File Name: {} | File Action: {}", fileInfo.GetName(), fileAction);
 		NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", fileInfo.GetHashString(), fileInfo.GetSize());
 
-		if (fileInfo.GetAction() != NosUpdate::FileInfo::FileActions::Update)
+		if (fileInfo.GetAction() != NosLib::Net::FileInfo::FileActions::Update)
 		{
 			continue;
 		}
 
-		NosUpdate::SendFile(TLSSocket, fileInfo.GetName());
+		NosLib::Net::SendFile(TLSSocket, fileInfo.GetName());
 	}
 }

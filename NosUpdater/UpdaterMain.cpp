@@ -1,4 +1,4 @@
-#include <NosUpdate/WinVersion.hpp>
+#include <NosLib/Boost/WinVersion.hpp>
 #include <NosUpdate/Definitions.hpp>
 
 #include <boost/asio.hpp>
@@ -34,10 +34,10 @@ void UpdateTest()
 	#if 1
 	std::string hostName = GetServerHostName();
 	#else
-	std::string hostName = Definitions::UpdateHostname;
+	std::string hostName = NosUpdate::Definitions::UpdateHostname;
 	#endif
 
-	TLSClient updateClient(io_context, ssl_context, hostName, Definitions::UpdatePort);
+	TLSClient updateClient(io_context, ssl_context, hostName, NosUpdate::Definitions::UpdatePort);
 	NosLib::Result<void> errorRet = updateClient.Connect();
 	NOSLOG_ASSERT(!errorRet, return, NosLib::Logging::Severity::Fatal, "Error Connecting to server: {}", errorRet.ErrorMessage());
 	

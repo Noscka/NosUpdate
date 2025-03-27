@@ -3,7 +3,7 @@
 
 #include <boost/serialization/vector.hpp>
 #include <NosUpdate/Info/ProgramInfo.hpp>
-#include <NosUpdate/Info/FileInfo.hpp>
+#include <NosLib/Net/FileInfo.hpp>
 #include <NosUpdate/Version.hpp>
 
 namespace NosUpdate
@@ -27,7 +27,7 @@ namespace NosUpdate
 	protected:
 		Version UpdateVersion;
 		ProgramInfo ProgramInfoObj;
-		std::vector<FileInfo> CurrentFiles;
+		std::vector<NosLib::Net::FileInfo> CurrentFiles;
 		//uint64_t AmountByteLeft;	/* Currently unused: how much the client already downloaded (where to continue from) */
 
 		void GetCurrentFiles(const std::string&);
@@ -50,7 +50,7 @@ namespace NosUpdate
 
 		Version GetUpdateVersion() const;
 		ProgramInfo GetProgramInfo() const;
-		std::vector<FileInfo> GetCurrentFileInfo() const;
+		std::vector<NosLib::Net::FileInfo> GetCurrentFileInfo() const;
 	};
 }
 

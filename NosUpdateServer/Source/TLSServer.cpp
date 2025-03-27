@@ -1,14 +1,14 @@
 #include "../Header/TLSServer.hpp"
 #include "../Header/TLSConnection.hpp"
 
-#include <NosUpdate/Helper.hpp>
+#include <NosLib/Net/Helper.hpp>
 
 #include <iostream>
 
 void TLSServer::AcceptLoop()
 {
 	NosLog::CreateLog(NosLog::Severity::Info, "Server Started");
-	std::string listenEndpoint = NosUpdate::EndpointAsString(ConnectionAcceptor.local_endpoint());
+	std::string listenEndpoint = NosLib::Net::EndpointAsString(ConnectionAcceptor.local_endpoint());
 	NosLog::CreateLog(NosLog::Severity::Debug, "Listening on: {}", listenEndpoint);
 
 	while (true)

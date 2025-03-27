@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../WinVersion.hpp"
+#include <NosLib/Boost/WinVersion.hpp>
+#include <NosUpdate/Internal/Export.hpp>
 
 #include <boost/asio.hpp>
 #include <NosUpdate/BoostExpand/polymorphic_portable_binary_oarchive.hpp>

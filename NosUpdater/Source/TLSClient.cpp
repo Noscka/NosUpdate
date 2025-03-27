@@ -1,9 +1,7 @@
 #include "../Header/TLSClient.hpp"
 
-#include <NosLib/ErrorHandling.hpp>
-
-#include <NosUpdate/Helper.hpp>
-#include <NosUpdate/FileNet/FileReceive.hpp>
+#include <NosLib/Net/Helper.hpp>
+#include <NosLib/Net/FileReceive.hpp>
 
 #include <iostream>
 #include <filesystem>
@@ -20,12 +18,12 @@ TLSClient::TCPStream& TLSClient::GetSocket()
 
 std::string TLSClient::GetLocalEndpoint()
 {
-	return NosUpdate::EndpointAsString(GetSocket().local_endpoint());
+	return NosLib::Net::EndpointAsString(GetSocket().local_endpoint());
 }
 
 std::string TLSClient::GetRemoteEndpoint()
 {
-	return NosUpdate::EndpointAsString(GetSocket().remote_endpoint());
+	return NosLib::Net::EndpointAsString(GetSocket().remote_endpoint());
 }
 
 NosLib::Result<void> TLSClient::Connect()
@@ -72,10 +70,10 @@ NosLib::Result<void> TLSClient::UpdateProgram()
 
 NosLib::Result<NosUpdate::Version> TLSClient::GetNewestVersion()
 {
-	NosUpdate::SerializeSend<NosUpdate::VersionRequest>(TLSSocket, NosUpdate::VersionRequest::VersionTypes::Newest);
+	NosLib::Net::SerializeSend<NosUpdate::VersionRequest>(TLSSocket, NosUpdate::VersionRequest::VersionTypes::Newest);
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Newest Version");
 
-	NosUpdate::VersionResponse::Ptr versionRes = NosUpdate::DeserializeRead<NosUpdate::VersionResponse>(TLSSocket);
+	NosUpdate::VersionResponse::Ptr versionRes = NosLib::Net::DeserializeRead<NosUpdate::VersionResponse>(TLSSocket);
 
 	NOSLOG_ASSERT(!versionRes, return NosLib::GenericErrors::Casting, NosLog::Severity::Error, "Unable to cast to Version Response");
 
@@ -86,10 +84,10 @@ NosLib::Result<NosUpdate::Version> TLSClient::GetNewestVersion()
 
 NosLib::Result<UpRes::Ptr> TLSClient::RequestUpdate(const NosUpdate::Version& version)
 {
-	NosUpdate::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, version, "TestProgram", "./TestProgram");
+	NosLib::Net::SerializeSend<NosUpdate::UpdateRequest>(TLSSocket, version, "TestProgram", "./TestProgram");
 	NosLog::CreateLog(NosLog::Severity::Info, "Requested Update Version");
 
-	UpRes::Ptr updateRes = NosUpdate::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
+	UpRes::Ptr updateRes = NosLib::Net::DeserializeRead<NosUpdate::UpdateResponse>(TLSSocket);
 
 	NOSLOG_ASSERT(!updateRes, return NosLib::GenericErrors::Casting, NosLog::Severity::Error, "Unable to cast to Update Response");
 
@@ -100,9 +98,9 @@ NosLib::Result<UpRes::Ptr> TLSClient::RequestUpdate(const NosUpdate::Version& ve
 
 NosLib::Result<void> TLSClient::ReceivedUpdateFiles(const NosUpdate::UpdateResponse::Ptr& updateRes)
 {
-	std::vector<NosUpdate::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
+	std::vector<NosLib::Net::FileInfo> fileInfos = updateRes->GetUpdateFileInfo();
 
-	for (NosUpdate::FileInfo& fileInfo : fileInfos)
+	for (NosLib::Net::FileInfo& fileInfo : fileInfos)
 	{
 		NosLib::Result<void> processingRes = ProcessUpdateFile(fileInfo);
 
@@ -117,7 +115,7 @@ NosLib::Result<void> TLSClient::ReceivedUpdateFiles(const NosUpdate::UpdateRespo
 }
 
 
-NosLib::Result<void> TLSClient::ProcessUpdateFile(const NosUpdate::FileInfo& updateFile)
+NosLib::Result<void> TLSClient::ProcessUpdateFile(const NosLib::Net::FileInfo& updateFile)
 {
 	NosLog::CreateLog(NosLog::Severity::Info, "Receiving file: File Name: {} | File Action: {}", updateFile.GetName(), updateFile.GetActionName());
 	NosLog::CreateLog(NosLog::Severity::Debug, "File Hash: {} | File Size: {}", updateFile.GetHashString(), updateFile.GetSize());
@@ -126,11 +124,11 @@ NosLib::Result<void> TLSClient::ProcessUpdateFile(const NosUpdate::FileInfo& upd
 
 	switch (updateFile.GetAction())
 	{
-	case NosUpdate::FileInfo::FileActions::Update:
-		NosUpdate::ReceiveFile(TLSSocket, updateFile.GetName(), updateFile.GetSize());
+	case NosLib::Net::FileInfo::FileActions::Update:
+		NosLib::Net::ReceiveFile(TLSSocket, updateFile.GetName(), updateFile.GetSize());
 		break;
 
-	case NosUpdate::FileInfo::FileActions::Delete:
+	case NosLib::Net::FileInfo::FileActions::Delete:
 		std::filesystem::remove(updateFile.GetName(), ec);
 		break;
 
