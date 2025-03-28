@@ -1,4 +1,5 @@
 ﻿cmake_minimum_required (VERSION 3.12)
+project ("NosUpdate")
 
 include("CMake/Versioning.cmake")
 include("CMake/CPM.cmake")
@@ -10,13 +11,11 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
-	set(Boost_USE_STATIC_LIBS ON) 
-else()
-	set(Boost_USE_STATIC_LIBS OFF) 
+	set(Boost_USE_STATIC_LIBS OFF)
+	set(Boost_USE_STATIC_RUNTIME OFF)
+	set(Boost_USE_MULTITHREADED ON)
 endif()
 
-set(Boost_USE_MULTITHREADED ON)  
-set(Boost_USE_STATIC_RUNTIME OFF) 
 set(BUILD_SHARED_LIBS ON)
 
 add_compile_definitions(WIN32_LEAN_AND_MEAN)
@@ -27,10 +26,8 @@ if(UNIX)
 endif()
 
 find_package(NosLib REQUIRED)
-find_package(Boost REQUIRED COMPONENTS thread serialization filesystem)
-INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+find_package(Boost REQUIRED COMPONENTS thread serialization filesystem asio)
 find_package(OpenSSL REQUIRED Crypto SSL)
-#CPMAddPackage("gh:rikyoz/bit7z@4.0.9") #Not even used right now
 
 add_subdirectory(NosUpdateLib)
 

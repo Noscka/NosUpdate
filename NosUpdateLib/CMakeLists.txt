@@ -5,9 +5,8 @@ file(GLOB_RECURSE NosUpdateLibSource CONFIGURE_DEPENDS "Source/*")
 add_library(${PROJECT_NAME} ${NosUpdateLibSource})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/Include> $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 target_link_libraries(${PROJECT_NAME} PUBLIC NosLib::NosLib
-                                             Boost::serialization Boost::filesystem
+                                             Boost::serialization Boost::filesystem Boost::asio
                                              OpenSSL::Crypto OpenSSL::SSL)
-                                             #bit7z)
 set_target_properties(${PROJECT_NAME} PROPERTIES VERSION ${PROJECT_VERSION})
 
 if(BUILD_SHARED_LIBS)
